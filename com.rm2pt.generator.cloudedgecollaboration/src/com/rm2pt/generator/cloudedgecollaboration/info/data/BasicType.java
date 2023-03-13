@@ -6,7 +6,12 @@ public abstract class BasicType extends Type{
         STRING,
         REAL,
         INTEGER,
-        TIME;
+        TIME,
+        BOOLEAN,
+    }
+
+    public void setTypeEnum(TypeEnum typeEnum) {
+        this.typeEnum = typeEnum;
     }
 
     public TypeEnum getTypeEnum() {

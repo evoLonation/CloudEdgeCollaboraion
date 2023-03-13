@@ -50,9 +50,9 @@ public class Processor {
 
         new ServicePackageGenerator(serviceFactory.getServiceList());
 
-        new RpcPackageGenerator(serviceFactory.getRpcServiceList());
-
-        new ListenPackageGenerator(serviceFactory.getNormalServiceList(), serviceFactory.getMqttServiceList(), serviceFactory.getHttpServiceList());
+//        new RpcPackageGenerator(serviceFactory.getRpcServiceList());
+//
+//        new ListenPackageGenerator(serviceFactory.getNormalServiceList(), serviceFactory.getMqttServiceList(), serviceFactory.getHttpServiceList());
 
 
     }
