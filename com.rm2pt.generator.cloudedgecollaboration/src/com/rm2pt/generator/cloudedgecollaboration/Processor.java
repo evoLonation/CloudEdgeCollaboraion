@@ -1,4 +1,5 @@
 package com.rm2pt.generator.cloudedgecollaboration;
+import com.rm2pt.generator.cloudedgecollaboration.common.Keyworder;
 import com.rm2pt.generator.cloudedgecollaboration.factory.EntityFactory;
 import com.rm2pt.generator.cloudedgecollaboration.factory.OperationBodyFactory;
 import com.rm2pt.generator.cloudedgecollaboration.factory.ServiceFactory;
@@ -30,11 +31,12 @@ public class Processor {
 
     public void process(){
     	
-    	System.out.println("hello, zzy");
+    	System.out.println(Keyworder.camelToUnderScore("MyNameIsZzy"));
+    	
         // 中间代码生成阶段
         EntityFactory entityFactory = new EntityFactory(domainModel.getEntity());
         entityFactory.factory();
-        ServiceFactory serviceFactory = new ServiceFactory(useCaseModel.getInteraction(), useCaseModel.getService(), entityFactory.getEntityMap());
+        ServiceFactory serviceFactory = new ServiceFactory(useCaseModel.getInteraction(), useCaseModel.getService(), useCaseModel.getContract(), entityFactory.getEntityMap());
         serviceFactory.factory();
         OperationBodyFactory operationBodyFactory = new OperationBodyFactory(useCaseModel.getContract(), serviceFactory.getServiceMap(), entityFactory.getEntityMap());
         operationBodyFactory.factory();

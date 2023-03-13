@@ -1,9 +1,8 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory;
 
-import com.rm2pt.generator.cloudedgecollaboration.info.Logic;
-import com.rm2pt.generator.cloudedgecollaboration.info.LogicBody;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
+import net.mydreamy.requirementmodel.rEMODEL.Contract;
 import net.mydreamy.requirementmodel.rEMODEL.Interaction;
 import net.mydreamy.requirementmodel.rEMODEL.Service;
 
@@ -19,7 +18,7 @@ import java.util.Map;
  */
 public class ServiceFactory {
 
-    public ServiceFactory(List<Interaction> interactionList, List<Service> serviceList, Map<String, EntityInfo> entityMap) {
+    public ServiceFactory(List<Interaction> interactionList, List<Service> serviceList, List<Contract> contractList, Map<String, EntityInfo> entityMap) {
 
     }
 

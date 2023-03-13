@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="net.mydreamy.requirementmodel_1.2.3.202202161722">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../../../BUAA/杨溢龙老师/包/net.mydreamy.requirementmodel_1.2.3.202202161722.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../../../BUAA/杨溢龙老师/包/org.eclipse.emf.common_2.23.0.v20210618-0700.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../../../BUAA/杨溢龙老师/包/org.eclipse.emf.ecore_2.25.0.v20210816-0937.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../../../BUAA/杨溢龙老师/包/org.eclipse.xtext.generator_2.25.0.v20210301-0909.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -17,4 +17,6 @@ public class Logic {
     // Nullable
     private Type returnType;
     private LogicBody logicBody;
+    private ServiceInfo serviceToCall;
+
 }
