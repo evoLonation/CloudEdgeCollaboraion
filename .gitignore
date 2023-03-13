@@ -1,0 +1,9 @@
+**/.idea
+**/bin
+**/xtend-gen
+**/target
+**/.project
+**/.settings
+*.feature
+*.updatesite
+**/*.iml
