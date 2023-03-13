@@ -28,21 +28,20 @@ public class ServiceFactory {
     public List<ServiceInfo> getServiceList(){
         throw new UnsupportedOperationException();
     }
+
+    /**
+     * @return key是Service的名字
+     */
     public Map<String, ServiceInfo> getServiceMap(){
         throw new UnsupportedOperationException();
     }
-    public List<ServiceInfo> getMqttServiceList(){
-        throw new UnsupportedOperationException();
-    }
-    public List<ServiceInfo> getRpcServiceList(){
-        throw new UnsupportedOperationException();
-    }
-    public List<ServiceInfo> getHttpServiceList(){
-        throw new UnsupportedOperationException();
-    }
-    public List<ServiceInfo> getNormalServiceList(){
-        throw new UnsupportedOperationException();
-    }
 
+
+    /**
+     * @return 返回满足参数条件的服务，要求复杂度O(1)
+     */
+    public List<ServiceInfo> getServiceList(ServiceInfo.LocationType locationType, ServiceInfo.InteractiveType interactiveType){
+        throw new UnsupportedOperationException();
+    }
 
 }
