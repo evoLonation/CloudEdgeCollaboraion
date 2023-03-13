@@ -12,5 +12,19 @@ public class ServiceInfo {
     // Nullable
     private Logic logic;
 
+    public String getName() {
+        return name;
+    }
 
+    public List<Variable> getGlobalVariableList() {
+        return globalVariableList;
+    }
+
+    public List<Operation> getOperationList() {
+        return operationList;
+    }
+
+    public Logic getLogic() {
+        return logic;
+    }
 }

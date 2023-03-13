@@ -5,4 +5,16 @@ public class Type {
     private String name;
     private boolean isEntity;
     private boolean isMulti;
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isEntity() {
+        return isEntity;
+    }
+
+    public boolean isMulti() {
+        return isMulti;
+    }
 }

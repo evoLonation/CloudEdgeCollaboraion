@@ -19,4 +19,27 @@ public class Logic {
     private LogicBody logicBody;
     private ServiceInfo serviceToCall;
 
+    public Caller getCaller() {
+        return caller;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Variable> getInputParamList() {
+        return inputParamList;
+    }
+
+    public Type getReturnType() {
+        return returnType;
+    }
+
+    public LogicBody getLogicBody() {
+        return logicBody;
+    }
+
+    public ServiceInfo getServiceToCall() {
+        return serviceToCall;
+    }
 }

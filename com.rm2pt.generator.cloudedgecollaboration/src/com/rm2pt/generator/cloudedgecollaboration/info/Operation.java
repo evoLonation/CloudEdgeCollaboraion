@@ -11,5 +11,21 @@ public class Operation {
     private List<Variable> inputParamList;
     private Type returnType;
     private OperationBody operationBody;
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Variable> getInputParamList() {
+        return inputParamList;
+    }
+
+    public Type getReturnType() {
+        return returnType;
+    }
+
+    public OperationBody getOperationBody() {
+        return operationBody;
+    }
 }
 

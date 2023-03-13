@@ -8,4 +8,8 @@ public abstract class BasicType extends Type{
         INTEGER,
         TIME;
     }
+
+    public TypeEnum getTypeEnum() {
+        return typeEnum;
+    }
 }

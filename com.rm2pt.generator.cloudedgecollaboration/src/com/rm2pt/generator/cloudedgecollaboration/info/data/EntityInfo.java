@@ -11,4 +11,16 @@ public class EntityInfo extends Type {
         EDGE,
         CACHE;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Variable> getAttributeList() {
+        return attributeList;
+    }
+
+    public StorageType getStorageType() {
+        return storageType;
+    }
 }
