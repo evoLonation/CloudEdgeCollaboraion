@@ -1,7 +1,5 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory;
 
-import com.rm2pt.generator.cloudedgecollaboration.info.Operation;
-import com.rm2pt.generator.cloudedgecollaboration.info.OperationBody;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import net.mydreamy.requirementmodel.rEMODEL.Contract;

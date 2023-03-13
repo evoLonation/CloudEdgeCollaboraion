@@ -1,6 +1,7 @@
 package com.rm2pt.generator.cloudedgecollaboration.info;
 
 
+import com.rm2pt.generator.cloudedgecollaboration.info.OperationBody.OperationBody;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Type;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
 
