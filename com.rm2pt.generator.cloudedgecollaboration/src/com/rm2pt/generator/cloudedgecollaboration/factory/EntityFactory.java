@@ -37,7 +37,7 @@ public class EntityFactory {
             String name = entity.getName();
             List<Attribute> attrs = entity.getAttributes();
             List<Invariance> invs = entity.getInvariance();
-            Variable id = getUniqueId(invs);
+            Variable id = getUniqueId(attrs, invs);
             EntityInfo.StorageType type = getStorageType(attrs);
             List<Variable> attrVar = new ArrayList<>();
             for (Attribute attr : attrs) {
@@ -152,6 +152,9 @@ public class EntityFactory {
             case "Boolean":
                 type.setName(BasicType.TypeEnum.BOOLEAN.name());
                 break;
+            case "String":
+                type.setName(BasicType.TypeEnum.STRING.name());
+                break;
             default:
                 throw new RuntimeException("Unknown BasicType: " + ((PrimitiveTypeCSImpl) attr.getType()).getName());
 
@@ -163,24 +166,39 @@ public class EntityFactory {
         return var;
     }
 
-    private Variable getUniqueId(List<Invariance> invs) { // UniqueId is guaranteed to be like "UniqueXXX", and XXX must be an attribute
+    private Variable getUniqueId(List<Attribute> attrs, List<Invariance> invs) { // UniqueId is guaranteed to be like "UniqueXXX", and XXX must be an attribute
         Variable id = new Variable();
-        boolean findId = false;
+        String idName = null;
+        String idTypeStr = null;
         for (Invariance inv : invs) {
             String invName = inv.getName();
             if (invName.contains("Unique")) {
-                findId = true;
-                id.setName(invName.replaceFirst("Unique", ""));
+                idName = invName.replaceFirst("Unique", "");
                 break;
             }
         }
-        if (!findId) { // no id, create a "GenerateId" to id, this is guaranteed not to be a non-multiple ref
-            id.setName("GenerateId");
+        if (idName == null) { // no id, create a "GenerateId" to id, this is guaranteed not to be a non-multiple ref
+            idName = "GenerateId";
+            idTypeStr = BasicType.TypeEnum.INTEGER.name();
+        }else {
+            for (Attribute attr : attrs){
+                if (!(attr.getType() instanceof PrimitiveTypeCSImpl)){
+                    continue;
+                }
+                Variable variable = attr2Variable(attr);
+                if (variable.getName().equals(idName)){
+                    idTypeStr = variable.getType().getName();
+                }
+            }
+            if (idTypeStr == null){
+                throw new RuntimeException("UniqueXXX is not an attribute of entity: " + idName);
+            }
         }
         Type idType = new Type();
-        idType.setName(BasicType.TypeEnum.INTEGER.name());
+        idType.setName(idTypeStr);
         idType.setEntity(false);
         idType.setMulti(false);
+        id.setName(idName);
         id.setType(idType);
         return id;
     }
