@@ -36,23 +36,23 @@ public class Processor {
         // 中间代码生成阶段
         EntityFactory entityFactory = new EntityFactory(domainModel.getEntity());
         entityFactory.factory();
-//        ServiceFactory serviceFactory = new ServiceFactory(useCaseModel.getInteraction(), useCaseModel.getService(), useCaseModel.getContract(), entityFactory.getEntityMap());
-//        serviceFactory.factory();
-//        OperationBodyFactory operationBodyFactory = new OperationBodyFactory(useCaseModel.getContract(), serviceFactory.getServiceMap(), entityFactory.getEntityMap());
-//        operationBodyFactory.factory();
+        ServiceFactory serviceFactory = new ServiceFactory(useCaseModel.getInteraction(), useCaseModel.getService(), useCaseModel.getContract(), entityFactory.getEntityMap());
+        serviceFactory.factory();
+        OperationBodyFactory operationBodyFactory = new OperationBodyFactory(useCaseModel.getContract(), serviceFactory.getServiceMap(), entityFactory.getEntityMap());
+        operationBodyFactory.factory();
 
         // todo lyh
         new ConfigPackageGenerator(null);
 
-        new DDLGenerator(entityFactory.getEntityList()).generate();
+        new DDLGenerator(entityFactory.getEntityList());
 
-        new EntityPackageGenerator(entityFactory.getEntityList()).generate();
+        new EntityPackageGenerator(entityFactory.getEntityList());
 
-//        new ServicePackageGenerator(serviceFactory.getServiceList());
+        new ServicePackageGenerator(serviceFactory.getServiceList());
 
-//        new RpcPackageGenerator(serviceFactory.getRpcServiceList());
-//
-//        new ListenPackageGenerator(serviceFactory.getNormalServiceList(), serviceFactory.getMqttServiceList(), serviceFactory.getHttpServiceList());
+        new RpcPackageGenerator(serviceFactory.getRpcServiceList());
+
+        new ListenPackageGenerator(serviceFactory.getNormalServiceList(), serviceFactory.getMqttServiceList(), serviceFactory.getHttpServiceList());
 
 
     }

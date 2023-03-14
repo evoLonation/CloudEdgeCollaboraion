@@ -132,40 +132,6 @@ public class EntityFactory {
         throw new RuntimeException("No StorageType found");
     }
 
-    private Variable attr2Variable(Attribute attr) {
-        Variable var = new Variable();
-        String name = attr.getName();
-        Type type = new Type();
-        if (!(attr.getType() instanceof PrimitiveTypeCSImpl)) {
-            throw new RuntimeException("Attribute is not PrimitiveTypeCSImpl");
-        }
-        switch (((PrimitiveTypeCSImpl) attr.getType()).getName()) {
-            case "Real":
-                type.setName(BasicType.TypeEnum.REAL.name());
-                break;
-            case "Integer":
-                type.setName(BasicType.TypeEnum.INTEGER.name());
-                break;
-            case "Date":
-                type.setName(BasicType.TypeEnum.TIME.name());
-                break;
-            case "Boolean":
-                type.setName(BasicType.TypeEnum.BOOLEAN.name());
-                break;
-            case "String":
-                type.setName(BasicType.TypeEnum.STRING.name());
-                break;
-            default:
-                throw new RuntimeException("Unknown BasicType: " + ((PrimitiveTypeCSImpl) attr.getType()).getName());
-
-        }
-        type.setEntity(false);
-        type.setMulti(false);
-        var.setName(name);
-        var.setType(type);
-        return var;
-    }
-
     private Variable getUniqueId(List<Attribute> attrs, List<Invariance> invs) { // UniqueId is guaranteed to be like "UniqueXXX", and XXX must be an attribute
         Variable id = new Variable();
         String idName = null;
@@ -201,6 +167,40 @@ public class EntityFactory {
         id.setName(idName);
         id.setType(idType);
         return id;
+    }
+
+    private Variable attr2Variable(Attribute attr) {
+        Variable var = new Variable();
+        String name = attr.getName();
+        Type type = new Type();
+        if (!(attr.getType() instanceof PrimitiveTypeCSImpl)) {
+            throw new RuntimeException("Attribute is not PrimitiveTypeCSImpl");
+        }
+        switch (((PrimitiveTypeCSImpl) attr.getType()).getName()) {
+            case "Real":
+                type.setName(BasicType.TypeEnum.REAL.name());
+                break;
+            case "Integer":
+                type.setName(BasicType.TypeEnum.INTEGER.name());
+                break;
+            case "Date":
+                type.setName(BasicType.TypeEnum.TIME.name());
+                break;
+            case "Boolean":
+                type.setName(BasicType.TypeEnum.BOOLEAN.name());
+                break;
+            case "String":
+                type.setName(BasicType.TypeEnum.STRING.name());
+                break;
+            default:
+                throw new RuntimeException("Unknown BasicType: " + ((PrimitiveTypeCSImpl) attr.getType()).getName());
+
+        }
+        type.setEntity(false);
+        type.setMulti(false);
+        var.setName(name);
+        var.setType(type);
+        return var;
     }
 
     /**
