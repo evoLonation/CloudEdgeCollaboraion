@@ -12,6 +12,7 @@ import net.mydreamy.requirementmodel.rEMODEL.impl.EnumEntityImpl;
 import net.mydreamy.requirementmodel.rEMODEL.impl.PrimitiveTypeCSImpl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class EntityFactory {
             List<Variable> attrVar = new ArrayList<>();
             for (Attribute attr : attrs) {
                 String attrName = attr.getName();
-                if (attrName.equals(id.getName()) || attrName.equals("Type")) {
+                if (attrName.equals(id.getName()) || attrName.equals("Type")) { // id and storageType are not attr
                     continue;
                 }
                 attrVar.add(attr2Variable(attr));
@@ -53,7 +54,7 @@ public class EntityFactory {
             info.setName(name);
             info.setAttributeList(attrVar);
             info.setStorageType(type);
-            if (type.equals(EntityInfo.StorageType.EDGE)){
+            if (type.equals(EntityInfo.StorageType.EDGE)){ // add EdgeId
                 Variable edgeId = new Variable();
                 edgeId.setName("EdgeId");
                 Type edgeIdType = new Type();
@@ -66,7 +67,7 @@ public class EntityFactory {
             this.infoList.add(info);
         }
         addRef2Attr();
-        outputEntityInfoListForDebug();
+        //outputEntityInfoListForDebug();
     }
 
     private void outputEntityInfoListForDebug() {
@@ -101,7 +102,7 @@ public class EntityFactory {
         }
     }
 
-    private EntityInfo EntityMatchEntityInfo(Entity entity){
+    private EntityInfo EntityMatchEntityInfo(Entity entity){ // find the entityInfo with the same name
         for (EntityInfo entityInfo : infoList){
             if (entity.getName().equals(entityInfo.getName())){
                 return entityInfo;
@@ -162,7 +163,7 @@ public class EntityFactory {
         return var;
     }
 
-    private Variable getUniqueId(List<Invariance> invs) {
+    private Variable getUniqueId(List<Invariance> invs) { // UniqueId is guaranteed to be like "UniqueXXX", and XXX must be an attribute
         Variable id = new Variable();
         boolean findId = false;
         for (Invariance inv : invs) {
@@ -188,13 +189,17 @@ public class EntityFactory {
      * @return 一个Entity表，用于通过Entity的名称检索到EntityInfo
      */
     public Map<String, EntityInfo> getEntityMap() {
-        throw new UnsupportedOperationException();
+        Map<String, EntityInfo>map = new HashMap<>();
+        for (EntityInfo entityInfo : infoList){
+            map.put(entityInfo.getName(), entityInfo);
+        }
+        return map;
     }
 
     /**
      * @return 返回所有的EntityInfo
      */
     public List<EntityInfo> getEntityList() {
-        throw new UnsupportedOperationException();
+        return infoList;
     }
 }
