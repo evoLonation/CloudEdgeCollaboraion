@@ -12,12 +12,20 @@ public class EntityInfo extends Type {
         this.name = name;
     }
 
+    public Variable getId() {
+        return id;
+    }
+
     public void setId(Variable id) {
         this.id = id;
     }
 
     public void setAttributeList(List<Variable> attributeList) {
         this.attributeList = attributeList;
+    }
+
+    public void addAttribute(Variable attribute){
+        this.attributeList.add(attribute);
     }
 
     public void setStorageType(StorageType storageType) {
