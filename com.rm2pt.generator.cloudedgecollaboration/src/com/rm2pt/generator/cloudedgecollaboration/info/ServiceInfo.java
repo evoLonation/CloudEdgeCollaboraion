@@ -43,4 +43,32 @@ public class ServiceInfo {
     public Logic getLogic() {
         return logic;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setGlobalVariableList(List<Variable> globalVariableList) {
+        this.globalVariableList = globalVariableList;
+    }
+
+    public void setOperationList(List<Operation> operationList) {
+        this.operationList = operationList;
+    }
+
+    public void setLogic(Logic logic) {
+        this.logic = logic;
+    }
+
+    public void setLocationType(LocationType locationType) {
+        this.locationType = locationType;
+    }
+
+    public InteractiveType getInteractiveType() {
+        return interactiveType;
+    }
+
+    public void setInteractiveType(InteractiveType interactiveType) {
+        this.interactiveType = interactiveType;
+    }
 }

@@ -42,4 +42,28 @@ public class Logic {
     public ServiceInfo getServiceToCall() {
         return serviceToCall;
     }
+
+    public void setCaller(Caller caller) {
+        this.caller = caller;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setInputParamList(List<Variable> inputParamList) {
+        this.inputParamList = inputParamList;
+    }
+
+    public void setReturnType(Type returnType) {
+        this.returnType = returnType;
+    }
+
+    public void setLogicBody(LogicBody logicBody) {
+        this.logicBody = logicBody;
+    }
+
+    public void setServiceToCall(ServiceInfo serviceToCall) {
+        this.serviceToCall = serviceToCall;
+    }
 }
