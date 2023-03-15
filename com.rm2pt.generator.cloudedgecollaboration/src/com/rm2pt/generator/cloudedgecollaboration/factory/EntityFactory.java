@@ -68,7 +68,7 @@ public class EntityFactory {
         outputEntityInfoListForDebug();
     }
 
-    private void outputEntityInfoListForDebug() { //if there is any problem with EntityInfo, use this to debug
+    public void outputEntityInfoListForDebug() { //if there is any problem with EntityInfo, use this to debug
         for (EntityInfo entityInfo : infoList) {
             System.out.println();
             System.out.println("EntityName: " + entityInfo.getName());

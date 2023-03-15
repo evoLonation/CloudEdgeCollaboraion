@@ -8,6 +8,7 @@ import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import net.mydreamy.requirementmodel.rEMODEL.DomainModel;
 import net.mydreamy.requirementmodel.rEMODEL.UseCaseModel;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
