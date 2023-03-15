@@ -19,12 +19,4 @@ public class Variable {
     public Type getType() {
         return type;
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
 }
