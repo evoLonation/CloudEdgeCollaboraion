@@ -1,6 +1,7 @@
 name: RM2PT CodeGenerator Cloudedgecollaboration
 
-on: [push]
+# on: [push]
+on: []
   
 jobs:
    
