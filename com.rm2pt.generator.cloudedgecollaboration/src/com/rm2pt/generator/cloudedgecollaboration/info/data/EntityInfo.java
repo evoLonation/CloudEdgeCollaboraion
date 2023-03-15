@@ -1,33 +1,13 @@
 package com.rm2pt.generator.cloudedgecollaboration.info.data;
 
-import java.util.List;
 import java.util.Map;
 
 public class EntityInfo extends Type {
     private String name;
-    // todo delete
-    private Variable id;
-    private List<Variable> attributeList;
     private StorageType storageType;
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Variable getId() {
-        return id;
-    }
-
-    public void setId(Variable id) {
-        this.id = id;
-    }
-
-    public void setAttributeList(List<Variable> attributeList) {
-        this.attributeList = attributeList;
-    }
-
-    public void addAttribute(Variable attribute){
-        this.attributeList.add(attribute);
     }
 
     public void setStorageType(StorageType storageType) {
@@ -42,11 +22,6 @@ public class EntityInfo extends Type {
 
     public String getName() {
         return name;
-    }
-
-    // todo delete
-    public List<Variable> getAttributeList() {
-        return attributeList;
     }
 
     public StorageType getStorageType() {
@@ -68,7 +43,6 @@ public class EntityInfo extends Type {
         ASSOCIATION;
     }
 
-
     public static class Attribute{
         private String name;
         private BasicType type;
@@ -80,6 +54,7 @@ public class EntityInfo extends Type {
         private boolean isMulti;
     }
 
+
     public static class ForeignKeyAss extends AssociationInfo{
         //指向关联对应的外键
         private String attributeName;
@@ -88,4 +63,18 @@ public class EntityInfo extends Type {
         // todo 暂时不用
     }
 
+    public KeyType getKeyType(String name){
+        throw new UnsupportedOperationException();
+    }
+
+    public Attribute getIdAttribute() {
+        return idAttribute;
+    }
+
+    public Attribute getAttribute(String name){
+        throw new UnsupportedOperationException();
+    }
+    public AssociationInfo getAssociation(String name){
+        throw new UnsupportedOperationException();
+    }
 }

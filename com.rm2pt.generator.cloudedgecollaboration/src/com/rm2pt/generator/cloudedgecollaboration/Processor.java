@@ -36,17 +36,16 @@ public class Processor {
         // 中间代码生成阶段
         EntityFactory entityFactory = new EntityFactory(domainModel.getEntity());
         entityFactory.factory();
+		new EntityPackageGenerator(entityFactory.getEntityList());
+		new DDLGenerator(entityFactory.getEntityList());
         ServiceFactory serviceFactory = new ServiceFactory(useCaseModel.getInteraction(), useCaseModel.getService(), useCaseModel.getContract(), entityFactory.getEntityMap());
         serviceFactory.factory();
 
         new ConfigPackageGenerator();
 
-        new DDLGenerator(entityFactory.getEntityList());
-
-        new EntityPackageGenerator(entityFactory.getEntityList());
-
         new ServicePackageGenerator(serviceFactory.getServiceList());
 
+		// todo zzy
         new RpcPackageGenerator(serviceFactory.getRpcServiceList());
 
         new ListenPackageGenerator(serviceFactory.getNormalServiceList(), serviceFactory.getMqttServiceList(), serviceFactory.getHttpServiceList());

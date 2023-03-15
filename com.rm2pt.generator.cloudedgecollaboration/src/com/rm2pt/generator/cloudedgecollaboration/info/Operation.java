@@ -3,6 +3,7 @@ package com.rm2pt.generator.cloudedgecollaboration.info;
 
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Type;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBody;
 
 import java.util.List;
 
@@ -38,10 +39,6 @@ public class Operation {
 
     public void setReturnType(Type returnType) {
         this.returnType = returnType;
-    }
-
-    public void setOperationBody(OperationBody operationBody) {
-        this.operationBody = operationBody;
     }
 
     public void setOperationBody(OperationBody operationBody) {

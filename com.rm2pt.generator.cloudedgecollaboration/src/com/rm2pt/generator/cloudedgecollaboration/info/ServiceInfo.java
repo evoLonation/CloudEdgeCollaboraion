@@ -11,22 +11,13 @@ public class ServiceInfo {
     private List<Operation> operationList;
     // Nullable
     private Logic logic;
-    public enum LocationType {
-        CLOUD,
-        EDGE;
-    }
     public enum InteractiveType{
         NORMAL,  // 没有Logic
         LOGICNORETURN,  //其Logic没有返回值
         LOGICTOUSER, //其Logic是有返回值且是由用户发起的消息
         LOGICTONODE;//其Logic是有返回值且是由另一个服务发起的消息
     }
-    private LocationType locationType;
     private InteractiveType interactiveType;
-
-    public LocationType getLocationType() {
-        return locationType;
-    }
 
     public String getName() {
         return name;
@@ -60,10 +51,6 @@ public class ServiceInfo {
         this.logic = logic;
     }
 
-    public void setLocationType(LocationType locationType) {
-        this.locationType = locationType;
-    }
-
     public InteractiveType getInteractiveType() {
         return interactiveType;
     }
@@ -72,7 +59,6 @@ public class ServiceInfo {
         this.interactiveType = interactiveType;
     }
 
-    // todo
     private Location location;
 
     public Location getLocation() {

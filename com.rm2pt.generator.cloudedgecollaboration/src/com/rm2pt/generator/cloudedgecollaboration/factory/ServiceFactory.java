@@ -1,5 +1,6 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory;
 
+import com.rm2pt.generator.cloudedgecollaboration.info.Location;
 import com.rm2pt.generator.cloudedgecollaboration.info.Logic;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.BasicType;
@@ -234,7 +235,7 @@ public class ServiceFactory {
     /**
      * @return 返回满足参数条件的服务，要求复杂度O(1)
      */
-    public List<ServiceInfo> getServiceList(ServiceInfo.LocationType locationType, ServiceInfo.InteractiveType interactiveType) {
+    public List<ServiceInfo> getServiceList(Location location, ServiceInfo.InteractiveType interactiveType) {
         List<ServiceInfo> list = new ArrayList<ServiceInfo>();
         for (ServiceInfo serviceInfo : serviceInfoList) {
             if (serviceInfo.getLocationType() == locationType && serviceInfo.getInteractiveType() == interactiveType) {
