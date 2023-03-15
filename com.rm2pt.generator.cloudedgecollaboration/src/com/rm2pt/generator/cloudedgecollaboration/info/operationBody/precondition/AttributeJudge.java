@@ -6,8 +6,11 @@ public class AttributeJudge extends BoolExp{
     private Value left;
     private Value right;
     public enum OP{
-        AND,
-        OR,
+        EQUALS,
+        LT,
+        GT,
+        LE,
+        GE,
     }
     private OP op;
 

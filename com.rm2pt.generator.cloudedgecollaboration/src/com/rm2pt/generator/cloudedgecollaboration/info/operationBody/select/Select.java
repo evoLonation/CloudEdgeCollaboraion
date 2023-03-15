@@ -2,12 +2,13 @@ package com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select;
 
 import com.rm2pt.generator.cloudedgecollaboration.info.Location;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.Statement;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.Value;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Select {
+public class Select extends Statement {
     private Variable variable;
     private List<String> selectedAttribute = new ArrayList<>();
     private Condition condition;

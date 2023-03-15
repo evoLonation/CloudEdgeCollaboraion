@@ -1,4 +1,4 @@
-package com.rm2pt.generator.cloudedgecollaboration.info.operationBody;
+package com.rm2pt.generator.cloudedgecollaboration.factory.zzy;
 
 import com.rm2pt.generator.cloudedgecollaboration.info.Operation;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;

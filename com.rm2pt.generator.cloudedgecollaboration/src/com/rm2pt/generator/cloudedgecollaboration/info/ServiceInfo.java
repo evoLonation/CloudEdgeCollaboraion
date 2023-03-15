@@ -30,4 +30,8 @@ public class ServiceInfo {
 
     // todo
     private Location location;
+
+    public Location getLocation() {
+        return location;
+    }
 }

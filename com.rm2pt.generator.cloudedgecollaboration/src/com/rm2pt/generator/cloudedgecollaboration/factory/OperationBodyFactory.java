@@ -6,7 +6,7 @@ import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Type;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBody;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.VariableTable;
+import com.rm2pt.generator.cloudedgecollaboration.factory.zzy.VariableTable;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Select;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.AttributeValue;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.Value;
@@ -26,18 +26,21 @@ public class OperationBodyFactory {
     private Operation operation;
     private Contract contract;
     private Map<String, EntityInfo> entityInfoMap;
+    private VariableTable variableTable;
     public OperationBodyFactory(Contract contract, Operation operation, ServiceInfo serviceInfo, Map<String, EntityInfo> entityInfoMap) {
         this.serviceInfo = serviceInfo;
         this.operation = operation;
         this.contract = contract;
         this.entityInfoMap = entityInfoMap;
+        this.variableTable = new VariableTable(serviceInfo, operation);
     }
 
     public void factory(){
-
+        OperationBody operationBody = new OperationBody(serviceInfo.getLocation());
     }
 
 }
+
 class OperationBodyDeal{
     private VariableTable variableTable;
     private Map<String, EntityInfo> entityInfoMap;
@@ -48,9 +51,10 @@ class OperationBodyDeal{
         this.entityInfoMap = entityInfoMap;
     }
     private OperationBody getBody(Contract contract) {
-        OperationBody operationBody = new OperationBody();
-        //todo
-        return operationBody;
+//        OperationBody operationBody = new OperationBody();
+//        todo
+//        return operationBody;
+        return null;
     }
 
     private Select getSelect(VariableDeclarationCS variableDeclaration){
