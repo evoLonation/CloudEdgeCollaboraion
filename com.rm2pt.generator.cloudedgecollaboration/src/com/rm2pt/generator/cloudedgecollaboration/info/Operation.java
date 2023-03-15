@@ -1,7 +1,7 @@
 package com.rm2pt.generator.cloudedgecollaboration.info;
 
 
-import com.rm2pt.generator.cloudedgecollaboration.info.OperationBody.OperationBody;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBody;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Type;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
 
@@ -27,6 +27,10 @@ public class Operation {
 
     public OperationBody getOperationBody() {
         return operationBody;
+    }
+
+    public void setOperationBody(OperationBody operationBody) {
+        this.operationBody = operationBody;
     }
 }
 
