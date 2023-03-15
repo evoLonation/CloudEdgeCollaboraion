@@ -37,6 +37,9 @@ public class DDLGenerator extends Generator {
 
             List<AttributeStr> attributes = new ArrayList<>();
             for (EntityInfo.Attribute attr : entityInfo.getAttributeList()) {
+                if (attr.getName().equals(idName)){
+                    continue;
+                }
                 String attrName = attr.getName();
                 String attrType = attr.getType().getTypeEnum().name();
                 attributes.add(new AttributeStr(

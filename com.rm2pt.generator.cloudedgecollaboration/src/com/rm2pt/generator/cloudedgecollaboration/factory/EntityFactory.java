@@ -39,6 +39,7 @@ public class EntityFactory {
             EntityInfo.Attribute id = getUniqueId(attrs, invs);
             EntityInfo.StorageType type = getStorageType(attrs);
             List<EntityInfo.Attribute> attributes = new ArrayList<>();
+            attributes.add(id);
             for (Attribute attr : attrs) {
                 String attrName = attr.getName();
                 if (attrName.equals(id.getName()) || attrName.equals("Type")) { // id and storageType are not attr
@@ -64,7 +65,7 @@ public class EntityFactory {
         }
         addRef2Association();
         generateMaps();
-//        outputEntityInfoListForDebug();
+        outputEntityInfoListForDebug();
     }
 
     private void outputEntityInfoListForDebug() { //if there is any problem with EntityInfo, use this to debug
