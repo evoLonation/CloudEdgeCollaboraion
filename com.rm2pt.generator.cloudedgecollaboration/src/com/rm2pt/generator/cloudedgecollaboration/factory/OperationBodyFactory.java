@@ -15,20 +15,22 @@ import net.mydreamy.requirementmodel.rEMODEL.*;
 import org.eclipse.emf.ecore.EObject;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
  * 接受合约的列表和服务相关的符号表生成出Operation的实际逻辑
  */
+// todo 写到ServiceInfoFactory里面
 public class OperationBodyFactory {
-    private Map<String, ServiceInfo> serviceInfoMap ;
+    private ServiceInfo serviceInfo;
+    private Operation operation;
+    private Contract contract;
     private Map<String, EntityInfo> entityInfoMap;
-    private List<Contract> contractList;
-    public OperationBodyFactory(List<Contract> contractList, Map<String, ServiceInfo> serviceInfoMap, Map<String, EntityInfo> entityInfoMap) {
-        this.contractList = contractList;
+    public OperationBodyFactory(Contract contract, Operation operation, ServiceInfo serviceInfo, Map<String, EntityInfo> entityInfoMap) {
+        this.serviceInfo = serviceInfo;
+        this.operation = operation;
+        this.contract = contract;
         this.entityInfoMap = entityInfoMap;
-        this.serviceInfoMap = serviceInfoMap;
     }
 
     public void factory(){
@@ -60,7 +62,7 @@ class OperationBodyDeal{
         // 得到condition
         LogicFormulaExpCS initExp = (LogicFormulaExpCS) variableDeclaration.getInitExpression();
         Select.Condition condition = getCondition(initExp, (EntityInfo) variable.getType());
-        return new Select(variable, condition, new ArrayList<>());
+        return new Select(variable, condition, new ArrayList<>(), null, null);
     }
 
     private Type getType(TypeCS typeCS){
