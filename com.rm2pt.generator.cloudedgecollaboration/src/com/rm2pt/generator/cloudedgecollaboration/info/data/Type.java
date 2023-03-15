@@ -10,6 +10,18 @@ public class Type {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEntity(boolean entity) {
+        isEntity = entity;
+    }
+
+    public void setMulti(boolean multi) {
+        isMulti = multi;
+    }
+
     public boolean isEntity() {
         return isEntity;
     }

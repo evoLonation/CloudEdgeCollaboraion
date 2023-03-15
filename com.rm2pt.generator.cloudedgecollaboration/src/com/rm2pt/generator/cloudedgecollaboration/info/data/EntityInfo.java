@@ -7,6 +7,31 @@ public class EntityInfo extends Type {
     private Variable id;
     private List<Variable> attributeList;
     private StorageType storageType;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Variable getId() {
+        return id;
+    }
+
+    public void setId(Variable id) {
+        this.id = id;
+    }
+
+    public void setAttributeList(List<Variable> attributeList) {
+        this.attributeList = attributeList;
+    }
+
+    public void addAttribute(Variable attribute){
+        this.attributeList.add(attribute);
+    }
+
+    public void setStorageType(StorageType storageType) {
+        this.storageType = storageType;
+    }
+
     public enum StorageType{
         CLOUD,
         EDGE,
