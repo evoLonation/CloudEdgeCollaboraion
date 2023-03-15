@@ -111,7 +111,7 @@ public class EntityFactory {
             }
             for (EntityInfo.Association association : entityInfo.getAssociationList()){
                 assoMap.put(association.getName(), association);
-                keyTypeMap.put(association.getName(), EntityInfo.KeyType.ASSOCIATION);
+                keyTypeMap.put(association.getTargetEntity().getName(), EntityInfo.KeyType.ASSOCIATION);
             }
         }
     }
