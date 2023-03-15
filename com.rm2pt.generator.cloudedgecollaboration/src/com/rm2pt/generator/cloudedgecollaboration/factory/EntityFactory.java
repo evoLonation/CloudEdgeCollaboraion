@@ -113,6 +113,9 @@ public class EntityFactory {
                 assoMap.put(association.getName(), association);
                 keyTypeMap.put(association.getTargetEntity().getIdAttribute().getName(), EntityInfo.KeyType.ASSOCIATION);
             }
+            entityInfo.setAssociationMap(assoMap);
+            entityInfo.setAttributeMap(attrMap);
+            entityInfo.setKeyTypeMap(keyTypeMap);
         }
     }
 
@@ -125,11 +128,11 @@ public class EntityFactory {
                 Entity refEntity = ref.getEntity();
                 EntityInfo matchedRefInfo = EntityMatchEntityInfo(refEntity);
                 EntityInfo.ForeignKeyAss association = new EntityInfo.ForeignKeyAss();
-                association.setName(ref.getName() + matchedRefInfo.getIdAttribute().getName());
+                association.setName(ref.getName());
                 association.setType(matchedRefInfo.getIdAttribute().getType());
                 association.setMulti(ref.isIsmultiple());
                 association.setTargetEntity(matchedRefInfo);
-                association.setRefAttrName(matchedRefInfo.getIdAttribute().getName());
+                association.setRefAttrName(ref.getName() + matchedRefInfo.getIdAttribute().getName());
                 associationList.add(association);
             }
             matchedInfo.setAssociationList(associationList);

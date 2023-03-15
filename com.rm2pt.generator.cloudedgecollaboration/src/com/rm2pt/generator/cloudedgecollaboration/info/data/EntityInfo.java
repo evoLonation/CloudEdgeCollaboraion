@@ -57,6 +57,18 @@ public class EntityInfo extends Type {
         associationList.add(association);
     }
 
+    public void setAttributeMap(Map<String, Attribute> attributeMap) {
+        this.attributeMap = attributeMap;
+    }
+
+    public void setAssociationMap(Map<String, Association> associationMap) {
+        this.associationMap = associationMap;
+    }
+
+    public void setKeyTypeMap(Map<String, KeyType> keyTypeMap) {
+        this.keyTypeMap = keyTypeMap;
+    }
+
     public StorageType getStorageType() {
         return storageType;
     }
