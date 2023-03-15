@@ -27,4 +27,7 @@ public class ServiceInfo {
     public Logic getLogic() {
         return logic;
     }
+
+    // todo
+    private Location location;
 }

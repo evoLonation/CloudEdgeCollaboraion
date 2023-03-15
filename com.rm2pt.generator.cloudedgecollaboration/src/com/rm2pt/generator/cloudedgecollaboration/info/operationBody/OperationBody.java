@@ -1,5 +1,6 @@
 package com.rm2pt.generator.cloudedgecollaboration.info.operationBody;
 
+import com.rm2pt.generator.cloudedgecollaboration.info.Location;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.precondition.Exp;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Select;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.store.Store;
@@ -15,6 +16,7 @@ public class OperationBody {
     private List<Statement> statementList;
 
     private List<Store> storeList;
+    private Location location;
 
     public void setSelectList(List<Select> selectList) {
         this.selectList = selectList;
