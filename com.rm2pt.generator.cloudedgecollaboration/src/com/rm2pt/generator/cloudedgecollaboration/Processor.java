@@ -38,11 +38,8 @@ public class Processor {
         entityFactory.factory();
         ServiceFactory serviceFactory = new ServiceFactory(useCaseModel.getInteraction(), useCaseModel.getService(), useCaseModel.getContract(), entityFactory.getEntityMap());
         serviceFactory.factory();
-        OperationBodyFactory operationBodyFactory = new OperationBodyFactory(useCaseModel.getContract(), serviceFactory.getServiceMap(), entityFactory.getEntityMap());
-        operationBodyFactory.factory();
 
-        // todo lyh
-        new ConfigPackageGenerator(null);
+        new ConfigPackageGenerator();
 
         new DDLGenerator(entityFactory.getEntityList());
 

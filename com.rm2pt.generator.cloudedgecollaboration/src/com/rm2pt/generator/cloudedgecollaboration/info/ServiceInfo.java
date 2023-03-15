@@ -71,4 +71,11 @@ public class ServiceInfo {
     public void setInteractiveType(InteractiveType interactiveType) {
         this.interactiveType = interactiveType;
     }
+
+    // todo
+    private Location location;
+
+    public Location getLocation() {
+        return location;
+    }
 }

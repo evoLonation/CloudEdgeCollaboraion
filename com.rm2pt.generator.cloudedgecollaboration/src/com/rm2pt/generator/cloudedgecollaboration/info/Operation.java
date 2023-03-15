@@ -43,5 +43,9 @@ public class Operation {
     public void setOperationBody(OperationBody operationBody) {
         this.operationBody = operationBody;
     }
+
+    public void setOperationBody(OperationBody operationBody) {
+        this.operationBody = operationBody;
+    }
 }
 
