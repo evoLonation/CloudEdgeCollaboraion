@@ -6,7 +6,6 @@ import com.rm2pt.generator.cloudedgecollaboration.generator.lyh.EntityStr;
 import com.rm2pt.generator.cloudedgecollaboration.generator.lyh.EntityTemplate;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import com.rm2pt.generator.cloudedgecollaboration.common.Keyworder;
-import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,19 +29,33 @@ public class DDLGenerator extends Generator {
             String entityName = entityInfo.getName();
             String storageType = entityInfo.getStorageType().name();
 
-            String idName = entityInfo.getId().getName();
-            String idType = entityInfo.getId().getType().getName();
+            String idName = entityInfo.getIdAttribute().getName();
+            String idType = entityInfo.getIdAttribute().getType().getTypeEnum().name();
             AttributeStr primaryKey = new AttributeStr(
                     Keyworder.camelToUnderScore(idName),
-                    entityType2SQLType(idType));
+                    basicType2SQLType(idType));
 
             List<AttributeStr> attributes = new ArrayList<>();
-            for (Variable attr : entityInfo.getAttributeList()){
+            for (EntityInfo.Attribute attr : entityInfo.getAttributeList()) {
                 String attrName = attr.getName();
-                String attrType = attr.getType().getName();
+                String attrType = attr.getType().getTypeEnum().name();
                 attributes.add(new AttributeStr(
                         Keyworder.camelToUnderScore(attrName),
-                        entityType2SQLType(attrType)));
+                        basicType2SQLType(attrType)));
+            }
+
+            for (EntityInfo.Association asso : entityInfo.getAssociationList()) {
+                if (!(asso instanceof EntityInfo.ForeignKeyAss)) {
+                    throw new AssertionError("association is not a foreign key!");
+                }
+                if (asso.isMulti()) {
+                    continue;
+                }
+                String assoName = ((EntityInfo.ForeignKeyAss) asso).getRefAttrName();
+                String assoType = ((EntityInfo.ForeignKeyAss) asso).getType().getTypeEnum().name();
+                attributes.add(new AttributeStr(
+                        Keyworder.camelToUnderScore(assoName),
+                        basicType2SQLType(assoType)));
             }
 
             EntityStr entityStr = new EntityStr(entityName, primaryKey, attributes);
@@ -59,7 +72,7 @@ public class DDLGenerator extends Generator {
         System.out.println("Generated_DDL");
     }
 
-    private String entityType2SQLType(String type) {
+    private String basicType2SQLType(String type) {
         switch (type) {
             case "INTEGER":
                 return "INT";

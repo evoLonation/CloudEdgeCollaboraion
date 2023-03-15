@@ -6,7 +6,6 @@ import com.rm2pt.generator.cloudedgecollaboration.generator.lyh.AttributeStr;
 import com.rm2pt.generator.cloudedgecollaboration.generator.lyh.EntityStr;
 import com.rm2pt.generator.cloudedgecollaboration.generator.lyh.EntityTemplate;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
-import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,26 +20,41 @@ public class EntityPackageGenerator extends Generator {
         infoList.addAll(EntityInfoList);
         GOEntityList = new ArrayList<>();
     }
+
     @Override
-    public void generate(){
+    public void generate() {
         for (EntityInfo entityInfo : infoList) {
             String entityName = entityInfo.getName();
 
-            String idName = entityInfo.getId().getName();
-            String idType = entityInfo.getId().getType().getName();
+            String idName = entityInfo.getIdAttribute().getName();
+            String idType = entityInfo.getIdAttribute().getType().getTypeEnum().name();
             AttributeStr primaryKey = new AttributeStr(
                     Keyworder.firstUpperCase(idName),
-                    entityType2GOType(idType),
+                    basicType2GOType(idType),
                     Keyworder.camelToUnderScore(idName));
 
             List<AttributeStr> attributes = new ArrayList<>();
-            for (Variable attr : entityInfo.getAttributeList()){
+            for (EntityInfo.Attribute attr : entityInfo.getAttributeList()) {
                 String attrName = attr.getName();
-                String attrType = attr.getType().getName();
+                String attrType = attr.getType().getTypeEnum().name();
                 attributes.add(new AttributeStr(
                         Keyworder.firstUpperCase(attrName),
-                        entityType2GOType(attrType),
+                        basicType2GOType(attrType),
                         Keyworder.camelToUnderScore(attrName)));
+            }
+            for (EntityInfo.Association asso : entityInfo.getAssociationList()) {
+                if (!(asso instanceof EntityInfo.ForeignKeyAss)) {
+                    throw new AssertionError("association is not a foreign key!");
+                }
+                if (asso.isMulti()) {
+                    continue;
+                }
+                String assoName = ((EntityInfo.ForeignKeyAss) asso).getRefAttrName();
+                String assoType = ((EntityInfo.ForeignKeyAss) asso).getType().getTypeEnum().name();
+                attributes.add(new AttributeStr(
+                        Keyworder.firstUpperCase(assoName),
+                        basicType2GOType(assoType),
+                        Keyworder.camelToUnderScore(assoName)));
             }
 
             EntityStr entityStr = new EntityStr(entityName, primaryKey, attributes);
@@ -51,7 +65,7 @@ public class EntityPackageGenerator extends Generator {
         System.out.println("Generated_GO");
     }
 
-    private String entityType2GOType(String type) {
+    private String basicType2GOType(String type) {
         switch (type) {
             case "INTEGER":
                 return "int32";

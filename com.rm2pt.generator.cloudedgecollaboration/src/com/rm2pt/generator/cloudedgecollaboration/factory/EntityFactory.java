@@ -1,9 +1,8 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory;
 
 import com.rm2pt.generator.cloudedgecollaboration.info.data.BasicType;
+import com.rm2pt.generator.cloudedgecollaboration.info.data.BasicType.TypeEnum;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
-import com.rm2pt.generator.cloudedgecollaboration.info.data.Type;
-import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
 import net.mydreamy.requirementmodel.rEMODEL.Attribute;
 import net.mydreamy.requirementmodel.rEMODEL.Entity;
 import net.mydreamy.requirementmodel.rEMODEL.Invariance;
@@ -21,7 +20,7 @@ import java.util.Map;
  */
 public class EntityFactory {
     private final List<Entity> entityList;
-    private List<EntityInfo> infoList;
+    private final List<EntityInfo> infoList;
 
     public EntityFactory(List<Entity> entityList) {
         this.entityList = new ArrayList<>();
@@ -37,68 +36,103 @@ public class EntityFactory {
             String name = entity.getName();
             List<Attribute> attrs = entity.getAttributes();
             List<Invariance> invs = entity.getInvariance();
-            Variable id = getUniqueId(attrs, invs);
+            EntityInfo.Attribute id = getUniqueId(attrs, invs);
             EntityInfo.StorageType type = getStorageType(attrs);
-            List<Variable> attrVar = new ArrayList<>();
+            List<EntityInfo.Attribute> attributes = new ArrayList<>();
             for (Attribute attr : attrs) {
                 String attrName = attr.getName();
                 if (attrName.equals(id.getName()) || attrName.equals("Type")) { // id and storageType are not attr
                     continue;
                 }
-                attrVar.add(attr2Variable(attr));
+                attributes.add(attr2InfoAttr(attr));
             }
 
             EntityInfo info = new EntityInfo();
-            info.setEntity(true);
-            info.setId(id);
+            info.setIdAttribute(id);
             info.setName(name);
-            info.setAttributeList(attrVar);
+            info.setAttributeList(attributes);
             info.setStorageType(type);
             if (type.equals(EntityInfo.StorageType.EDGE)){ // add EdgeId
-                Variable edgeId = new Variable();
+                EntityInfo.Attribute edgeId = new EntityInfo.Attribute();
                 edgeId.setName("EdgeId");
-                Type edgeIdType = new Type();
-                edgeIdType.setName(BasicType.TypeEnum.INTEGER.name());
-                edgeIdType.setEntity(false);
-                edgeIdType.setMulti(false);
+                BasicType edgeIdType = new BasicType();
+                edgeIdType.setTypeEnum(TypeEnum.INTEGER);
                 edgeId.setType(edgeIdType);
                 info.addAttribute(edgeId);
             }
             this.infoList.add(info);
         }
-        addRef2Attr();
-        //outputEntityInfoListForDebug();
+        addRef2Association();
+        generateMaps();
+//        outputEntityInfoListForDebug();
     }
 
-    private void outputEntityInfoListForDebug() {
+    private void outputEntityInfoListForDebug() { //if there is any problem with EntityInfo, use this to debug
         for (EntityInfo entityInfo : infoList) {
             System.out.println();
-            System.out.println("name: " + entityInfo.getName());
-            System.out.println("id: " + entityInfo.getId().getName());
+            System.out.println("EntityName: " + entityInfo.getName());
+            System.out.println("idName: " + entityInfo.getIdAttribute().getName());
+            System.out.println("idType: "+entityInfo.getIdAttribute().getType().getTypeEnum().name());
             System.out.println("storageType: " + entityInfo.getStorageType().name());
             System.out.println("Attributes:");
-            List<Variable> attrs = entityInfo.getAttributeList();
+            List<EntityInfo.Attribute> attrs = entityInfo.getAttributeList();
             for (int i = 0; i < attrs.size(); i++) {
-                Variable attr = attrs.get(i);
-                System.out.println("Attr" + i + ": ");
-                System.out.println("attrName: " + attr.getName());
-                System.out.println("attrType: " + attr.getType().getName());
+                EntityInfo.Attribute attr = attrs.get(i);
+                System.out.println("-Attr" + i + ": ");
+                System.out.println("--attrName: " + attr.getName());
+                System.out.println("--attrType: " + attr.getType().getTypeEnum().name());
+            }
+            System.out.println("Associations:");
+            List<EntityInfo.Association> associations = entityInfo.getAssociationList();
+            for (int i = 0; i < associations.size(); i++){
+                EntityInfo.Association association = associations.get(i);
+                if (!(association instanceof EntityInfo.ForeignKeyAss)){
+                    throw new AssertionError("association is not a foreign key!");
+                }
+                System.out.println("-Asso" + i + ": ");
+                System.out.println("--assoName: " + association.getName());
+                System.out.println("--assoIsMulti: " + association.isMulti());
+                System.out.println("--assoRefEntityName: " + association.getTargetEntity().getName());
+                System.out.println("--assoRefName: " + ((EntityInfo.ForeignKeyAss) association).getRefAttrName());
+                System.out.println("--assoRefType: " + ((EntityInfo.ForeignKeyAss) association).getType().getTypeEnum().name());
             }
         }
     }
 
-    private void addRef2Attr() {
+    private void generateMaps(){
+        for (EntityInfo entityInfo : infoList){
+            Map<String, EntityInfo.Attribute> attrMap = new HashMap<>();
+            Map<String, EntityInfo.Association> assoMap = new HashMap<>();
+            Map<String, EntityInfo.KeyType> keyTypeMap = new HashMap<>();
+
+            for (EntityInfo.Attribute attribute : entityInfo.getAttributeList()){
+                attrMap.put(attribute.getName(), attribute);
+                keyTypeMap.put(attribute.getName(), EntityInfo.KeyType.ATTRIBUTE);
+            }
+            for (EntityInfo.Association association : entityInfo.getAssociationList()){
+                assoMap.put(association.getName(), association);
+                keyTypeMap.put(association.getName(), EntityInfo.KeyType.ASSOCIATION);
+            }
+        }
+    }
+
+    private void addRef2Association() {
         for (Entity entity : entityList) {
             List<Reference> refs = entity.getReference();
             EntityInfo matchedInfo = EntityMatchEntityInfo(entity);
+            List<EntityInfo.Association> associationList = new ArrayList<>();
             for (Reference ref : refs) {
                 Entity refEntity = ref.getEntity();
-                if (ref.isIsmultiple()) { //multiple is not attr
-                    continue;
-                }
                 EntityInfo matchedRefInfo = EntityMatchEntityInfo(refEntity);
-                matchedInfo.addAttribute(matchedRefInfo.getId());
+                EntityInfo.ForeignKeyAss association = new EntityInfo.ForeignKeyAss();
+                association.setName(ref.getName() + matchedRefInfo.getIdAttribute().getName());
+                association.setType(matchedRefInfo.getIdAttribute().getType());
+                association.setMulti(ref.isIsmultiple());
+                association.setTargetEntity(matchedRefInfo);
+                association.setRefAttrName(matchedRefInfo.getIdAttribute().getName());
+                associationList.add(association);
             }
+            matchedInfo.setAssociationList(associationList);
         }
     }
 
@@ -132,10 +166,10 @@ public class EntityFactory {
         throw new RuntimeException("No StorageType found");
     }
 
-    private Variable getUniqueId(List<Attribute> attrs, List<Invariance> invs) { // UniqueId is guaranteed to be like "UniqueXXX", and XXX must be an attribute
-        Variable id = new Variable();
+    private EntityInfo.Attribute getUniqueId(List<Attribute> attrs, List<Invariance> invs) { // UniqueId is guaranteed to be like "UniqueXXX", and XXX must be an attribute
+        EntityInfo.Attribute id = new EntityInfo.Attribute();
         String idName = null;
-        String idTypeStr = null;
+        BasicType idType = new BasicType();
         for (Invariance inv : invs) {
             String invName = inv.getName();
             if (invName.contains("Unique")) {
@@ -145,62 +179,57 @@ public class EntityFactory {
         }
         if (idName == null) { // no id, create a "GenerateId" to id, this is guaranteed not to be a non-multiple ref
             idName = "GenerateId";
-            idTypeStr = BasicType.TypeEnum.INTEGER.name();
+            idType.setTypeEnum(TypeEnum.INTEGER);
         }else {
             for (Attribute attr : attrs){
                 if (!(attr.getType() instanceof PrimitiveTypeCSImpl)){
                     continue;
                 }
-                Variable variable = attr2Variable(attr);
-                if (variable.getName().equals(idName)){
-                    idTypeStr = variable.getType().getName();
+                EntityInfo.Attribute attribute = attr2InfoAttr(attr);
+                if (attribute.getName().equals(idName)){
+                    idType = attribute.getType();
                 }
             }
-            if (idTypeStr == null){
+            if (idType == null){
                 throw new RuntimeException("UniqueXXX is not an attribute of entity: " + idName);
             }
         }
-        Type idType = new Type();
-        idType.setName(idTypeStr);
-        idType.setEntity(false);
-        idType.setMulti(false);
         id.setName(idName);
         id.setType(idType);
         return id;
     }
 
-    private Variable attr2Variable(Attribute attr) {
-        Variable var = new Variable();
+    private EntityInfo.Attribute attr2InfoAttr(Attribute attr) {
+        EntityInfo.Attribute attribute = new EntityInfo.Attribute();
         String name = attr.getName();
-        Type type = new Type();
+        BasicType type = new BasicType();
         if (!(attr.getType() instanceof PrimitiveTypeCSImpl)) {
             throw new RuntimeException("Attribute is not PrimitiveTypeCSImpl");
         }
         switch (((PrimitiveTypeCSImpl) attr.getType()).getName()) {
             case "Real":
-                type.setName(BasicType.TypeEnum.REAL.name());
+                type.setTypeEnum(TypeEnum.REAL);
                 break;
             case "Integer":
-                type.setName(BasicType.TypeEnum.INTEGER.name());
+                type.setTypeEnum(TypeEnum.INTEGER);
                 break;
             case "Date":
                 type.setName(BasicType.TypeEnum.TIME.name());
+                type.setTypeEnum(TypeEnum.TIME);
                 break;
             case "Boolean":
-                type.setName(BasicType.TypeEnum.BOOLEAN.name());
+                type.setTypeEnum(TypeEnum.BOOLEAN);
                 break;
             case "String":
-                type.setName(BasicType.TypeEnum.STRING.name());
+                type.setTypeEnum(TypeEnum.STRING);
                 break;
             default:
                 throw new RuntimeException("Unknown BasicType: " + ((PrimitiveTypeCSImpl) attr.getType()).getName());
 
         }
-        type.setEntity(false);
-        type.setMulti(false);
-        var.setName(name);
-        var.setType(type);
-        return var;
+        attribute.setName(name);
+        attribute.setType(type);
+        return attribute;
     }
 
     /**

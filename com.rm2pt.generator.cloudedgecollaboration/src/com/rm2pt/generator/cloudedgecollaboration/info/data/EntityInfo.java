@@ -1,10 +1,65 @@
 package com.rm2pt.generator.cloudedgecollaboration.info.data;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EntityInfo extends Type {
     private String name;
     private StorageType storageType;
+    private Attribute idAttribute;
+    private Map<String, Attribute> attributeMap;
+    private Map<String, Association> associationMap;
+    private Map<String, KeyType> keyTypeMap;
+    private List<Attribute> attributeList;
+    private List<Association> associationList;
+
+    public enum StorageType {
+        CLOUD,
+        EDGE,
+        CACHE
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setIdAttribute(Attribute idAttribute) {
+        this.idAttribute = idAttribute;
+    }
+
+    public Attribute getIdAttribute() {
+        return idAttribute;
+    }
+
+    public List<Attribute> getAttributeList() {
+        return attributeList;
+    }
+
+    public List<Association> getAssociationList() {
+        return associationList;
+    }
+
+    public void setAttributeList(List<Attribute> attributeList) {
+        this.attributeList = attributeList;
+    }
+
+    public void setAssociationList(List<Association> associationList) {
+        this.associationList = associationList;
+    }
+
+    public void addAttribute(Attribute attribute){
+        attributeList.add(attribute);
+    }
+
+    public void addAssociation(Association association){
+        associationList.add(association);
+    }
+
+    public StorageType getStorageType() {
+        return storageType;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -14,67 +69,98 @@ public class EntityInfo extends Type {
         this.storageType = storageType;
     }
 
-    public enum StorageType{
-        CLOUD,
-        EDGE,
-        CACHE;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public StorageType getStorageType() {
-        return storageType;
-    }
-
-
-
-    private Attribute idAttribute;
-    //需要包含属性、id和关联转化的属性
-    private Map<String, Variable> attributeMap;
-    //所有的关联
-    private Map<String, AssociationInfo> associationMap;
-    // 原来的entity中的各种key对应的类型
-    private Map<String, KeyType> keyTypeMap;
-
     public enum KeyType {
         ATTRIBUTE,
-        ASSOCIATION;
+        ASSOCIATION
     }
 
-    public static class Attribute{
+    public static class Attribute {
         private String name;
         private BasicType type;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public BasicType getType() {
+            return type;
+        }
+
+        public void setType(BasicType type) {
+            this.type = type;
+        }
     }
 
-    public static abstract class AssociationInfo {
+    public static abstract class Association {
         private String name;
         private EntityInfo targetEntity;
         private boolean isMulti;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public EntityInfo getTargetEntity() {
+            return targetEntity;
+        }
+
+        public void setTargetEntity(EntityInfo targetEntity) {
+            this.targetEntity = targetEntity;
+        }
+
+        public boolean isMulti() {
+            return isMulti;
+        }
+
+        public void setMulti(boolean multi) {
+            isMulti = multi;
+        }
     }
 
-
-    public static class ForeignKeyAss extends AssociationInfo{
+    public static class ForeignKeyAss extends Association {
         //指向关联对应的外键
-        private String attributeName;
+        private String refAttrName;
+        private BasicType type;
+
+        public String getRefAttrName() {
+            return refAttrName;
+        }
+
+        public void setRefAttrName(String name) {
+            this.refAttrName = name;
+        }
+
+        public BasicType getType() {
+            return type;
+        }
+
+        public void setType(BasicType type) {
+            this.type = type;
+        }
     }
-    public static class JoinTableAss extends AssociationInfo {
+
+    public static class JoinTableAss extends Association {
         // todo 暂时不用
     }
 
-    public KeyType getKeyType(String name){
-        throw new UnsupportedOperationException();
+
+    public KeyType getKeyType(String name) {
+        return keyTypeMap.get(name);
     }
 
-    public Attribute getIdAttribute() {
-        return idAttribute;
+    public Attribute getAttribute(String name) {
+        return attributeMap.get(name);
     }
 
-    public Attribute getAttribute(String name){
-        throw new UnsupportedOperationException();
-    }
-    public AssociationInfo getAssociation(String name){
-        throw new UnsupportedOperationException();
+    public Association getAssociation(String name) {
+        return associationMap.get(name);
     }
 }
