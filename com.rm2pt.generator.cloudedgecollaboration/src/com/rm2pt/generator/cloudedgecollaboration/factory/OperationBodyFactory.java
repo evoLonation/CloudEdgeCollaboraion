@@ -50,7 +50,7 @@ class OperationBodyDeal{
         variableTable = new VariableTable(serviceInfo, operation);
         this.entityInfoMap = entityInfoMap;
     }
-    private OperationBody getBody(Contract contract) {
+    public OperationBody getBody(Contract contract) {
 //        OperationBody operationBody = new OperationBody();
 //        todo
 //        return operationBody;

@@ -11,6 +11,7 @@ public class ServiceInfo {
     private List<Operation> operationList;
     // Nullable
     private Logic logic;
+    private Location location;
     public enum InteractiveType{
         NORMAL,  // 没有Logic
         LOGICNORETURN,  //其Logic没有返回值
@@ -23,32 +24,40 @@ public class ServiceInfo {
         return name;
     }
 
-    public List<Variable> getGlobalVariableList() {
-        return globalVariableList;
-    }
-
-    public List<Operation> getOperationList() {
-        return operationList;
-    }
-
-    public Logic getLogic() {
-        return logic;
-    }
-
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Variable> getGlobalVariableList() {
+        return globalVariableList;
     }
 
     public void setGlobalVariableList(List<Variable> globalVariableList) {
         this.globalVariableList = globalVariableList;
     }
 
+    public List<Operation> getOperationList() {
+        return operationList;
+    }
+
     public void setOperationList(List<Operation> operationList) {
         this.operationList = operationList;
     }
 
+    public Logic getLogic() {
+        return logic;
+    }
+
     public void setLogic(Logic logic) {
         this.logic = logic;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     public InteractiveType getInteractiveType() {
@@ -57,11 +66,5 @@ public class ServiceInfo {
 
     public void setInteractiveType(InteractiveType interactiveType) {
         this.interactiveType = interactiveType;
-    }
-
-    private Location location;
-
-    public Location getLocation() {
-        return location;
     }
 }

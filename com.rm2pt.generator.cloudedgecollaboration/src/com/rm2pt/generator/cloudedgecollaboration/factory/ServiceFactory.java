@@ -7,6 +7,7 @@ import com.rm2pt.generator.cloudedgecollaboration.info.data.BasicType;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Type;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBody;
 import net.mydreamy.requirementmodel.rEMODEL.*;
 import net.mydreamy.requirementmodel.rEMODEL.impl.*;
 import org.eclipse.emf.common.util.EList;
@@ -55,10 +56,10 @@ public class ServiceFactory {
             ServiceInfo serviceInfo = new ServiceInfo();
             if (service.getName().startsWith("Cloud")) {
                 serviceInfo.setName(service.getName().replace("Cloud", ""));
-                serviceInfo.setLocationType(ServiceInfo.LocationType.CLOUD);
+                serviceInfo.setLocation(Location.CLOUD);
             } else if (service.getName().startsWith("Edge")) {
                 serviceInfo.setName(service.getName().replace("Edge", ""));
-                serviceInfo.setLocationType(ServiceInfo.LocationType.EDGE);
+                serviceInfo.setLocation(Location.EDGE);
             } else {
                 throw new RuntimeException("Invalid Service Name: " + service.getName());
             }
@@ -66,9 +67,7 @@ public class ServiceFactory {
             EList<Attribute> tempProperties = service.getTemp_property();
             List<Variable> variables = new ArrayList<Variable>();
             for (Attribute attribute : tempProperties) {
-                Variable variable = new Variable();
-                variable.setName(attribute.getName());
-                variable.setType(convertTypeCSToType(attribute.getType()));
+                Variable variable = new Variable(attribute.getName(), convertTypeCSToType(attribute.getType()));
                 variables.add(variable);
             }
             serviceInfo.setGlobalVariableList(variables);
@@ -85,15 +84,15 @@ public class ServiceFactory {
                 EList<Parameter> parameters = o.getParameter();
                 List<Variable> inputParamList = new ArrayList<Variable>();
                 for (Parameter p : parameters) {
-                    Variable variable = new Variable();
-                    variable.setName(p.getName());
-                    variable.setType(convertTypeCSToType(p.getType()));
+                    Variable variable = new Variable(p.getName(), convertTypeCSToType(p.getType()));
                     inputParamList.add(variable);
                 }
                 operation.setInputParamList(inputParamList);
 
+                Contract contract = null;
                 for (Contract c : contractList) {
                     if (c.getOp().getName().equals(o.getName())) {
+                        contract = c;
                         if (c.getOp().getReturnType() != null) {
                             operation.setReturnType(convertTypeCSToType(c.getOp().getReturnType()));
                         }
@@ -101,7 +100,9 @@ public class ServiceFactory {
                     }
                 }
 
-                // TODO: OperationBody
+                OperationBodyDeal operationBodyDeal = new OperationBodyDeal(serviceInfo, operation, contract, entityMap);
+                OperationBody operationBody = operationBodyDeal.getBody(contract);
+                operation.setOperationBody(operationBody);
 
                 operations.add(operation);
                 operationMap.put(operation.getName(), operation);
@@ -174,12 +175,6 @@ public class ServiceFactory {
                 serviceInfo.setInteractiveType(ServiceInfo.InteractiveType.NORMAL);
             }
 
-            if (serviceInfo.getName().startsWith("Edge")) {
-                serviceInfo.setLocationType(ServiceInfo.LocationType.EDGE);
-            } else if (serviceInfo.getName().startsWith("Cloud")) {
-                serviceInfo.setLocationType(ServiceInfo.LocationType.CLOUD);
-            }
-
             serviceInfoList.add(serviceInfo);
             serviceInfoMap.put(service.getName(), serviceInfo);
         }
@@ -238,7 +233,7 @@ public class ServiceFactory {
     public List<ServiceInfo> getServiceList(Location location, ServiceInfo.InteractiveType interactiveType) {
         List<ServiceInfo> list = new ArrayList<ServiceInfo>();
         for (ServiceInfo serviceInfo : serviceInfoList) {
-            if (serviceInfo.getLocationType() == locationType && serviceInfo.getInteractiveType() == interactiveType) {
+            if (serviceInfo.getLocation() == location && serviceInfo.getInteractiveType() == interactiveType) {
                 list.add(serviceInfo);
             }
         }
