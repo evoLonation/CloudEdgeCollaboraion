@@ -6,4 +6,8 @@ public class EntityTypeInfo extends Type{
     public EntityInfo getEntityInfo() {
         return entityInfo;
     }
+
+    public EntityTypeInfo(EntityInfo entityInfo) {
+        this.entityInfo = entityInfo;
+    }
 }
