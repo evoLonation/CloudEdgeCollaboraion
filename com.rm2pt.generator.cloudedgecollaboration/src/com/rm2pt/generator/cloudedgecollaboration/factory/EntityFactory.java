@@ -126,12 +126,15 @@ public class EntityFactory {
             EntityInfo matchedInfo = EntityMatchEntityInfo(entity);
             List<EntityInfo.Association> associationList = new ArrayList<>();
             for (Reference ref : refs) {
+                if (ref.isIsmultiple()){
+                    continue;
+                }
                 Entity refEntity = ref.getEntity();
                 EntityInfo matchedRefInfo = EntityMatchEntityInfo(refEntity);
                 EntityInfo.ForeignKeyAss association = new EntityInfo.ForeignKeyAss();
                 association.setName(ref.getName());
                 association.setType(matchedRefInfo.getIdAttribute().getType());
-                association.setMulti(false);
+                association.setMulti(ref.isIsmultiple());
                 association.setTargetEntity(matchedRefInfo);
                 association.setRefAttrName(ref.getName() + matchedRefInfo.getIdAttribute().getName());
                 associationList.add(association);
