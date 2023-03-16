@@ -92,7 +92,7 @@ public class EntityFactory {
                 }
                 System.out.println("-Asso" + i + ": ");
                 System.out.println("--assoName: " + association.getName());
-                System.out.println("--assoIsMulti: " + association.isMulti());
+//                System.out.println("--assoIsMulti: " + association.isMulti());
                 System.out.println("--assoRefEntityName: " + association.getTargetEntity().getName());
                 System.out.println("--assoRefName: " + ((EntityInfo.ForeignKeyAss) association).getRefAttrName());
                 System.out.println("--assoRefType: " + ((EntityInfo.ForeignKeyAss) association).getType().getTypeEnum().name());
@@ -218,7 +218,6 @@ public class EntityFactory {
                 type.setTypeEnum(TypeEnum.INTEGER);
                 break;
             case "Date":
-                type.setName(BasicType.TypeEnum.TIME.name());
                 type.setTypeEnum(TypeEnum.TIME);
                 break;
             case "Boolean":
