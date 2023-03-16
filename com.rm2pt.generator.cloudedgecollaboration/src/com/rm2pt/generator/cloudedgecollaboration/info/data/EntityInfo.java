@@ -3,7 +3,7 @@ package com.rm2pt.generator.cloudedgecollaboration.info.data;
 import java.util.List;
 import java.util.Map;
 
-public class EntityInfo extends Type {
+public class EntityInfo {
     private String name;
     private StorageType storageType;
     private Attribute idAttribute;
