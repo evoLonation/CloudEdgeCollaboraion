@@ -92,7 +92,7 @@ public class EntityFactory {
                 }
                 System.out.println("-Asso" + i + ": ");
                 System.out.println("--assoName: " + association.getName());
-//                System.out.println("--assoIsMulti: " + association.isMulti());
+                System.out.println("--assoIsMulti: " + association.isMulti());
                 System.out.println("--assoRefEntityName: " + association.getTargetEntity().getName());
                 System.out.println("--assoRefName: " + ((EntityInfo.ForeignKeyAss) association).getRefAttrName());
                 System.out.println("--assoRefType: " + ((EntityInfo.ForeignKeyAss) association).getType().getTypeEnum().name());
@@ -131,7 +131,7 @@ public class EntityFactory {
                 EntityInfo.ForeignKeyAss association = new EntityInfo.ForeignKeyAss();
                 association.setName(ref.getName());
                 association.setType(matchedRefInfo.getIdAttribute().getType());
-                association.setMulti(ref.isIsmultiple());
+                association.setMulti(false);
                 association.setTargetEntity(matchedRefInfo);
                 association.setRefAttrName(ref.getName() + matchedRefInfo.getIdAttribute().getName());
                 associationList.add(association);
