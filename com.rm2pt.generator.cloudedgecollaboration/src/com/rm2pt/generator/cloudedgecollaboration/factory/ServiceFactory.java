@@ -3,10 +3,7 @@ package com.rm2pt.generator.cloudedgecollaboration.factory;
 import com.rm2pt.generator.cloudedgecollaboration.info.Location;
 import com.rm2pt.generator.cloudedgecollaboration.info.Logic;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
-import com.rm2pt.generator.cloudedgecollaboration.info.data.BasicType;
-import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
-import com.rm2pt.generator.cloudedgecollaboration.info.data.Type;
-import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
+import com.rm2pt.generator.cloudedgecollaboration.info.data.*;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBody;
 import net.mydreamy.requirementmodel.rEMODEL.*;
 import net.mydreamy.requirementmodel.rEMODEL.impl.*;
@@ -209,7 +206,7 @@ public class ServiceFactory {
             if (entityInfo == null) {
                 throw new RuntimeException("Entity not found: " + ((EntityTypeImpl) typeCS).getEntity().getName());
             }
-            return entityInfo;
+            return new EntityTypeInfo(entityInfo);
         } else {
             throw new RuntimeException("Invalid TypeCS: " + typeCS);
         }
