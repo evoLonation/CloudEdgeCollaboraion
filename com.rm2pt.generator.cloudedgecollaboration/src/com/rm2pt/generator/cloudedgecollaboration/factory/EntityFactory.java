@@ -58,6 +58,7 @@ public class EntityFactory {
                 edgeId.setName("EdgeId");
                 BasicType edgeIdType = new BasicType();
                 edgeIdType.setTypeEnum(TypeEnum.INTEGER);
+                edgeIdType.setMulti(false);
                 edgeId.setType(edgeIdType);
                 info.addAttribute(edgeId);
             }
@@ -82,6 +83,7 @@ public class EntityFactory {
                 System.out.println("-Attr" + i + ": ");
                 System.out.println("--attrName: " + attr.getName());
                 System.out.println("--attrType: " + attr.getType().getTypeEnum().name());
+                System.out.println("--attrTypeIsMulti: " + attr.getType().isMulti());
             }
             System.out.println("Associations:");
             List<EntityInfo.Association> associations = entityInfo.getAssociationList();
@@ -198,6 +200,7 @@ public class EntityFactory {
                 throw new RuntimeException("UniqueXXX is not an attribute of entity: " + idName);
             }
         }
+        idType.setMulti(false);
         id.setName(idName);
         id.setType(idType);
         return id;
@@ -218,7 +221,6 @@ public class EntityFactory {
                 type.setTypeEnum(TypeEnum.INTEGER);
                 break;
             case "Date":
-                type.setName(BasicType.TypeEnum.TIME.name());
                 type.setTypeEnum(TypeEnum.TIME);
                 break;
             case "Boolean":
@@ -231,6 +233,7 @@ public class EntityFactory {
                 throw new RuntimeException("Unknown BasicType: " + ((PrimitiveTypeCSImpl) attr.getType()).getName());
 
         }
+        type.setMulti(false);
         attribute.setName(name);
         attribute.setType(type);
         return attribute;
