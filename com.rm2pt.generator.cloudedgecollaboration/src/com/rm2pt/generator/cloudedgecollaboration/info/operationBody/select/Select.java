@@ -3,7 +3,6 @@ package com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select;
 import com.rm2pt.generator.cloudedgecollaboration.info.Location;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.Statement;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,58 +37,15 @@ public class Select extends Statement {
     }
 
 
-    public void addSelectedAttribute(String selectedAttribute) {
-        this.selectedAttribute.add(selectedAttribute);
+    public List<Sort> getSortList() {
+        return sortList;
     }
 
-
-    public static class Condition{
-
+    public Integer getLimit() {
+        return limit;
     }
-    public static class AtomicCondition extends Condition {
-        private String attributeName;
-        private Variable variable;
-        public enum OP{
-            EQUALS,
-            BT,
-            LT,
-            BQ,
-            LQ,
-        }
-        private OP op;
-    }
-    public static class BinaryCondition extends Condition{
-        public enum OP{
-            AND,
-            OR,
-        }
-        private Condition left;
-        private Condition right;
-        private OP op;
-    }
-    public static class Sort {
-        private String attributeName;
-        private Rule rule;
-        public enum Rule {
-            ASCENDING,
-            DESCENDING,
-        }
-    }
-    public static class AttributeEquals extends Condition{
-        private String attributeName;
-        private Value value;
 
-        public AttributeEquals(String attributeName, Value value) {
-            this.attributeName = attributeName;
-            this.value = value;
-        }
-
-        public String getAttributeName() {
-            return attributeName;
-        }
-
-        public Value getValue() {
-            return value;
-        }
+    public Location getLocation() {
+        return location;
     }
 }

@@ -14,7 +14,8 @@ public class VariableTable {
         PARAM,
         GLOBAL,
         DEFINITION,
-        LET;
+        LET,
+        GENERATE,
     }
 
     private Map<String, Variable> localVariableMap;
@@ -59,6 +60,11 @@ public class VariableTable {
         localVariableMap.put(variable.getName(), variable);
         variableTypeMap.put(variable, VariableType.LET);
     }
+    public void addGenerateVariable(Variable variable){
+        localVariableMap.put(variable.getName(), variable);
+        variableTypeMap.put(variable, VariableType.GENERATE);
+    }
+
     public void attributeChanged(Variable variable, String attribute){
         variableChangedMap.putIfAbsent(variable, new ArrayList<>());
         variableChangedMap.get(variable).add(attribute);

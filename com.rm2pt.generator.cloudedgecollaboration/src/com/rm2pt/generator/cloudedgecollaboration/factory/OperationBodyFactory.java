@@ -1,5 +1,6 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory;
 
+import com.rm2pt.generator.cloudedgecollaboration.factory.zzy.OperationBodyContext;
 import com.rm2pt.generator.cloudedgecollaboration.info.Operation;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
@@ -7,6 +8,7 @@ import com.rm2pt.generator.cloudedgecollaboration.info.data.Type;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBody;
 import com.rm2pt.generator.cloudedgecollaboration.factory.zzy.VariableTable;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Condition;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Select;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.AttributeValue;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.Value;
@@ -20,23 +22,22 @@ import java.util.Map;
 /**
  * 接受合约的列表和服务相关的符号表生成出Operation的实际逻辑
  */
-// todo 写到ServiceInfoFactory里面
-public class OperationBodyFactory {
+public class OperationBodyFactory extends OperationBodyContext {
     private ServiceInfo serviceInfo;
     private Operation operation;
     private Contract contract;
-    private Map<String, EntityInfo> entityInfoMap;
-    private VariableTable variableTable;
     public OperationBodyFactory(Contract contract, Operation operation, ServiceInfo serviceInfo, Map<String, EntityInfo> entityInfoMap) {
         this.serviceInfo = serviceInfo;
         this.operation = operation;
         this.contract = contract;
-        this.entityInfoMap = entityInfoMap;
-        this.variableTable = new VariableTable(serviceInfo, operation);
+        OperationBodyContext.entityInfoMap = entityInfoMap;
+        OperationBodyContext.variableTable = new VariableTable(serviceInfo, operation);
+        OperationBodyContext.operationBody = new OperationBody();
     }
 
     public void factory(){
-        OperationBody operationBody = new OperationBody(serviceInfo.getLocation());
+        operationBody.setLocation(serviceInfo.getLocation());
+
     }
 
 }
@@ -65,7 +66,7 @@ class OperationBodyDeal{
         variableTable.addDefinitionVariable(variable);
         // 得到condition
         LogicFormulaExpCS initExp = (LogicFormulaExpCS) variableDeclaration.getInitExpression();
-        Select.Condition condition = getCondition(initExp, (EntityInfo) variable.getType());
+        Condition condition = getCondition(initExp, (EntityInfo) variable.getType());
         return new Select(variable, condition, new ArrayList<>(), null, null);
     }
 
@@ -78,7 +79,7 @@ class OperationBodyDeal{
         }
     }
 
-    private Select.Condition getCondition(LogicFormulaExpCS initExpression, EntityInfo entityInfo){
+    private Condition getCondition(LogicFormulaExpCS initExpression, EntityInfo entityInfo){
         // logic的exps只能有一个
         check(initExpression.getAtomicexp().size() == 1);
         // 子exp只能是atomicExp
@@ -108,7 +109,7 @@ class OperationBodyDeal{
             check(judgeExp.getInfixop().equals("="));
             String attr = left.getAttribute();
             Value value = getValue(judgeExp.getRightside());
-            return new Select.AttributeEquals(attr, value);
+            return new AttributeEquals(attr, value);
         } else {
             throw new UnsupportedOperationException();
         }
