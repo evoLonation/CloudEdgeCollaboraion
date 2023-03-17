@@ -1,12 +1,14 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory.zzy;
 
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
-import com.rm2pt.generator.cloudedgecollaboration.info.data.*;
+import com.rm2pt.generator.cloudedgecollaboration.info.data.BasicType;
+import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
+import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityTypeInfo;
+import com.rm2pt.generator.cloudedgecollaboration.info.data.Type;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBody;
 import net.mydreamy.requirementmodel.rEMODEL.EntityType;
 import net.mydreamy.requirementmodel.rEMODEL.PrimitiveTypeCS;
 import net.mydreamy.requirementmodel.rEMODEL.TypeCS;
-import net.mydreamy.requirementmodel.rEMODEL.VariableExpCS;
 
 import java.util.Map;
 
@@ -19,9 +21,6 @@ public class OperationBodyContext {
         if(!condition){
             throw new UnsupportedOperationException();
         }
-    }
-    static protected Variable getVariable(VariableExpCS variableExpCS){
-        return variableTable.getLocalVariable(variableExpCS.getSymbol());
     }
 
     static protected Type getType(TypeCS typeCS){

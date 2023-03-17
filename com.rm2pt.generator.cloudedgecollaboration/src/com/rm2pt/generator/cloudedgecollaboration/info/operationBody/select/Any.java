@@ -1,20 +1,20 @@
 package com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select;
 
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.statement.Statement;
 
-public class Select extends Statement {
+public class Any {
     private Variable targetVar;
-    private CollectionOp collectionOp;
+    private Condition condition;
     private Source source;
 
-    public Select(Variable targetVar, CollectionOp collectionOp, Source source) {
+    public Any(Variable targetVar, Condition condition, Source source) {
         this.targetVar = targetVar;
-        this.collectionOp = collectionOp;
+        this.condition = condition;
         this.source = source;
+        check();
     }
-    private void check(){
-        if(targetVar.getType().isMulti() && targetVar.mustGetEntity().equals(source.getEntityInfo())){
+    public void check() {
+        if(!targetVar.getType().isMulti() && targetVar.mustGetEntity().equals(source.getEntityInfo())){
             return;
         }
         throw new UnsupportedOperationException();
@@ -24,8 +24,8 @@ public class Select extends Statement {
         return targetVar;
     }
 
-    public CollectionOp getCollectionOp() {
-        return collectionOp;
+    public Condition getCondition() {
+        return condition;
     }
 
     public Source getSource() {

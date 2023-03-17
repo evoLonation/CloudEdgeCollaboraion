@@ -4,15 +4,11 @@ import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityTypeInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Type;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.AtomicCondition;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Condition;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Select;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Sort;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.AttributeValue;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.Value;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.VariableValue;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.AttributeRef;
 import net.mydreamy.requirementmodel.rEMODEL.*;
-import net.mydreamy.requirementmodel.rEMODEL.impl.EntityTypeImpl;
 import org.eclipse.emf.ecore.EObject;
 
 import java.util.ArrayList;
@@ -90,9 +86,9 @@ public class DefinitionFactory extends OperationBodyContext{
 
 
     public static class PCValue extends PCRet{
-        public AttributeValue attributeValue;
-        public PCValue(AttributeValue attributeValue) {
-            this.attributeValue = attributeValue;
+        public AttributeRef attributeRef;
+        public PCValue(AttributeRef attributeRef) {
+            this.attributeRef = attributeRef;
         }
     }
     public static class PCSelect extends PCRet{
@@ -131,7 +127,7 @@ public class DefinitionFactory extends OperationBodyContext{
         switch (entityInfo.getKeyType(realKey)){
         case ATTRIBUTE:
             EntityInfo.Attribute attribute = entityInfo.getAttribute(key);
-            return new PCValue(new AttributeValue(callee, attribute.getName()));
+            return new PCValue(new AttributeRef(callee, attribute.getName()));
         case ASSOCIATION:
             EntityInfo.Association association = entityInfo.getAssociation(key);
 
@@ -147,7 +143,7 @@ public class DefinitionFactory extends OperationBodyContext{
                     selectBuilder.addCondition(
                             new AtomicCondition(
                                     foreignKeyAss.getRefAttrName(),
-                                    new AttributeValue(callee, entityInfo.getIdAttribute().getName()),
+                                    new AttributeRef(callee, entityInfo.getIdAttribute().getName()),
                                     AtomicCondition.OP.EQUALS
                             )
                     );
@@ -164,7 +160,7 @@ public class DefinitionFactory extends OperationBodyContext{
                     selectBuilder.addCondition(
                             new AtomicCondition(
                                     targetEntity.getIdAttribute().getName(),
-                                    new AttributeValue(callee, foreignKeyAss.getName()),
+                                    new AttributeRef(callee, foreignKeyAss.getName()),
                                     AtomicCondition.OP.EQUALS
                             )
                     );
@@ -274,9 +270,9 @@ public class DefinitionFactory extends OperationBodyContext{
         if(exp instanceof PropertyCallExpCS) {
             PropertyCallExpCS property = (PropertyCallExpCS) exp;
             if(property.getName().getSymbol().equals("self")){
-                return new AttributeValue(variableTable.getGlobalVariable(property.getSelfproperty().getSymbol()), property.getAttribute());
+                return new AttributeRef(variableTable.getGlobalVariable(property.getSelfproperty().getSymbol()), property.getAttribute());
             }else{
-                return new AttributeValue(variableTable.getLocalVariable(property.getName().getSymbol()), property.getAttribute());
+                return new AttributeRef(variableTable.getLocalVariable(property.getName().getSymbol()), property.getAttribute());
             }
         }else if(exp instanceof VariableExpCS){
             return new VariableValue(variableTable.getLocalVariable(((VariableExpCS) exp).getSymbol()));

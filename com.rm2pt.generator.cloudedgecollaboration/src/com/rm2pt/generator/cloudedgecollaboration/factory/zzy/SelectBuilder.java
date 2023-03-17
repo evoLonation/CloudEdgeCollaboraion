@@ -2,7 +2,6 @@ package com.rm2pt.generator.cloudedgecollaboration.factory.zzy;
 
 import com.rm2pt.generator.cloudedgecollaboration.info.Location;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.BinaryCondition;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Condition;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Select;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Sort;

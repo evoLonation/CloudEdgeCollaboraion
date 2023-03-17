@@ -4,7 +4,6 @@ package com.rm2pt.generator.cloudedgecollaboration.factory.zzy;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityTypeInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.AtomicCondition;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Condition;
 import net.mydreamy.requirementmodel.rEMODEL.*;
 
@@ -13,6 +12,7 @@ import java.util.List;
 // iteratorExp通常用于表达集合的操作
 public class IteratorExpDealer extends OperationBodyContext{
     private final CallExpDealer callExpDealer = new CallExpDealer();
+
 
     public static class IESelect{
         // 待设置variable
@@ -27,47 +27,46 @@ public class IteratorExpDealer extends OperationBodyContext{
     // 处理集合的操作
     // 一个是转化为数据库的condition
     // todo 一个是对已有的集合执行操作
-    private DefinitionFactory.IESelect dealIteratorExp(IteratorExpCS iteratorExp){
+    public IESelect dealIteratorExp(IteratorExpCS iteratorExp){
+        boolean isAllInstance;
+        EntityInfo entityInfo = null;
         if(iteratorExp.getSimpleCall() != null){
             // todo
             throw new UnsupportedOperationException();
         }else if(iteratorExp.getObjectCall() != null){
-            FeatureCallExpCS featureCallExpCS = iteratorExp.getObjectCall();
-            SelectBuilder selectBuilder;
-            EntityInfo entityInfo = null;
-            if(featureCallExpCS instanceof PropertyCallExpCS){
-                var ret = (DefinitionFactory.PCSelect) callExpDealer.dealPropertyCall((PropertyCallExpCS) featureCallExpCS);
-                selectBuilder = ret.selectBuilder;
-                entityInfo = ret.entityInfo;
-            } else if(featureCallExpCS instanceof ClassiferCallExpCS) {
-                var ret = callExpDealer.dealClassiferCall((ClassiferCallExpCS) featureCallExpCS);
-                selectBuilder = ret.selectBuilder;
-                entityInfo = ret.entityInfo;
+            var callExp = iteratorExp.getObjectCall();
+            if(callExp instanceof PropertyCallExpCS){
+                // todo
+                throw new UnsupportedOperationException();
+            } else if(callExp instanceof ClassiferCallExpCS) {
+                entityInfo = callExpDealer.dealClassiferCall((ClassiferCallExpCS) callExp);
+                isAllInstance = true;
             }
-            String internalVar = dealVariables(iteratorExp.getVaribles(), entityInfo);
-            switch (iteratorExp.getIterator()) {
-                case "any()":
-
-                case "select()":
-                case "collect()":
-
-
-
-            }
-
         }else{
             throw new UnsupportedOperationException();
         }
+        String internalVar = dealVariables(iteratorExp.getVaribles(), entityInfo);
+        switch (iteratorExp.getIterator()) {
+            case "any()":
+
+            case "select()":
+            case "collect()":
+
+
+
+        }
     }
 
-    private String dealVariables(List<VariableDeclarationCS> variableList, EntityInfo entityInfo) {
+    private void dealVariables(List<VariableDeclarationCS> variableList, EntityInfo entityInfo) {
         check(variableList.size() == 1);
         var variable = variableList.get(0);
-        check(new EntityTypeInfo(entityInfo).equals(getType(variable.getType())));
-        return variable.getName();
+        var varName = variable.getName();
+        var varType = getType(variable.getType());
+        check(new EntityTypeInfo(entityInfo).equals(varType));
+        variableTable.addInternalVar(new Variable(varName, varType));
     }
 
-    private Condition dealAnySelect(LogicFormulaExpCS logicFormulaExp, String variable, EntityInfo entityInfo) {
+    private Condition dealAnySelect(LogicFormulaExpCS logicFormulaExp, EntityInfo entityInfo) {
         // left
         check(logicFormulaExp.getAtomicexp().size() == 1);
         var atomicExp = (AtomicExpression) logicFormulaExp.getAtomicexp().get(0);
@@ -89,10 +88,6 @@ public class IteratorExpDealer extends OperationBodyContext{
         var right = atomicExp.getRightside();
 
         // todo exp (right的right）
-
-    }
-
-    private Condition dealAtomicExp(AtomicExpression atomicExp) {
 
     }
 

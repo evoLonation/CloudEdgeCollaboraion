@@ -10,9 +10,7 @@ import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBo
 import com.rm2pt.generator.cloudedgecollaboration.factory.zzy.VariableTable;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Condition;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Select;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.AttributeValue;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.Value;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.VariableValue;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.AttributeRef;
 import net.mydreamy.requirementmodel.rEMODEL.*;
 import org.eclipse.emf.ecore.EObject;
 
@@ -120,9 +118,9 @@ class OperationBodyDeal{
         if(exp instanceof PropertyCallExpCS) {
             PropertyCallExpCS property = (PropertyCallExpCS) exp;
             if(property.getName().getSymbol().equals("self")){
-                return new AttributeValue(variableTable.getGlobalVariable(property.getSelfproperty().getSymbol()), property.getAttribute());
+                return new AttributeRef(variableTable.getGlobalVariable(property.getSelfproperty().getSymbol()), property.getAttribute());
             }else{
-                return new AttributeValue(variableTable.getLocalVariable(property.getName().getSymbol()), property.getAttribute());
+                return new AttributeRef(variableTable.getLocalVariable(property.getName().getSymbol()), property.getAttribute());
             }
         }else if(exp instanceof VariableExpCS){
             return new VariableValue(variableTable.getLocalVariable(((VariableExpCS) exp).getSymbol()));

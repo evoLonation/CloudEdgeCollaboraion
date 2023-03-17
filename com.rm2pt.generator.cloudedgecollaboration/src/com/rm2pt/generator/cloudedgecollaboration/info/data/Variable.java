@@ -11,6 +11,7 @@ package com.rm2pt.generator.cloudedgecollaboration.info.data;
 public class Variable {
     private String name;
     private Type type;
+    // todo lyz需要设置一下
     public enum ScopeType {
         PARAM,
         GLOBAL,
@@ -38,5 +39,9 @@ public class Variable {
 
     public Type getType() {
         return type;
+    }
+
+    public EntityInfo mustGetEntity(){
+        return ((EntityTypeInfo)type).getEntityInfo();
     }
 }
