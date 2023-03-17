@@ -7,11 +7,7 @@ import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo
 import com.rm2pt.generator.cloudedgecollaboration.generator.lyz.ServiceParser
 
 class ServiceTemplate {
-	static def String generateService(ServiceInfo service) {
-		ServiceParser parser = new ServiceParser(service);
-		List<Variable> globalVariableList = service.getGlobalVariableList();
-		List<Operation> operationList = service.getOperationList();
-		List<Variable> inputParamList = service.getInputParamList();
+	static def String generateService(ServiceInfo service, List<Variable> globalVariableList, List<Operation> operationList) {
 		'''
 		package service
 		
@@ -29,12 +25,12 @@ class ServiceTemplate {
 		}
 		
 		«FOR operation : operationList»
-		func (p *«service.getName()») «operation.getName()»(«paser.parseOperationParameter(operation.getName())») error {
-			«// TODO: operationBody»
+		func (p *«service.getName()») «operation.getName()»(«ServiceParser.parseOperationParameter(service, operation.getName())») error {
 			«operation.getOperationBody().toString()»
 		}
 
 		«ENDFOR»
 		'''
+		
 	}
 }

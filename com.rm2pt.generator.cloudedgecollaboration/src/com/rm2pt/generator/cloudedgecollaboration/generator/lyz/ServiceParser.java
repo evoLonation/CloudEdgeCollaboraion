@@ -7,15 +7,9 @@ import com.rm2pt.generator.cloudedgecollaboration.info.data.*;
 import java.util.List;
 
 public class ServiceParser {
-    ServiceInfo serviceInfo;
-
-    public ServiceParser(ServiceInfo serviceInfo) {
-        this.serviceInfo = serviceInfo;
-    }
-
-    public String parseOperationParameter(String operationName) {
+    public static String parseOperationParameter(ServiceInfo service, String operationName) {
         String parameterStr = "";
-        List<Operation> operationList = serviceInfo.getOperationList();
+        List<Operation> operationList = service.getOperationList();
         for (Operation operation : operationList) {
             if (operation.getName().equals(operationName)) {
                 List<Variable> inputParamList = operation.getInputParamList();
