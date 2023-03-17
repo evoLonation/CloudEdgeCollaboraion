@@ -1,31 +1,31 @@
 package com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select;
 
 import com.rm2pt.generator.cloudedgecollaboration.info.Location;
-import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.Statement;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.statement.Statement;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.VariableValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Select extends Statement {
-    private Variable variable;
+    private VariableValue variableValue;
     private List<String> selectedAttribute = new ArrayList<>();
     private Condition condition;
     private List<Sort> sortList;
-    private Integer limit;
+    private Limit limit;
 
     private Location location;
 
-    public Select(Variable variable, Condition condition, List<Sort> sortList, Integer limit, Location location) {
-        this.variable = variable;
+    public Select(VariableValue variableValue, Condition condition, List<Sort> sortList, Limit limit, Location location) {
+        this.variableValue = variableValue;
         this.condition = condition;
         this.sortList = sortList;
         this.limit = limit;
         this.location = location;
     }
 
-    public Variable getVariable() {
-        return variable;
+    public VariableValue getVariableValue() {
+        return variableValue;
     }
 
     public List<String> getSelectedAttribute() {
@@ -41,7 +41,7 @@ public class Select extends Statement {
         return sortList;
     }
 
-    public Integer getLimit() {
+    public Limit getLimit() {
         return limit;
     }
 

@@ -1,6 +1,7 @@
 package com.rm2pt.generator.cloudedgecollaboration.info.operationBody;
 
 import com.rm2pt.generator.cloudedgecollaboration.info.Location;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.statement.Statement;
 
 import java.util.ArrayList;
 import java.util.List;

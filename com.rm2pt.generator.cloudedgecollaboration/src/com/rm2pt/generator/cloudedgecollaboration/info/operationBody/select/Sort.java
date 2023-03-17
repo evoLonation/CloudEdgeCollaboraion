@@ -1,6 +1,6 @@
 package com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select;
 
-public class Sort {
+public class Sort extends CollectionOp{
     private String attributeName;
     private Rule rule;
 
