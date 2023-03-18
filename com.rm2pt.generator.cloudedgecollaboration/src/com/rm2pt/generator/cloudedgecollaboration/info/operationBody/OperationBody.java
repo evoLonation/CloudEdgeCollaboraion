@@ -27,5 +27,9 @@ public class OperationBody {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+    public List<Statement> getStatementList() {
+        return statementList;
+    }
 }
 
