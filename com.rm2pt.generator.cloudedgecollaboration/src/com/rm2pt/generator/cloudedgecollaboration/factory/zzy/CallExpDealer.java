@@ -11,8 +11,12 @@ import net.mydreamy.requirementmodel.rEMODEL.PropertyCallExpCS;
 import net.mydreamy.requirementmodel.rEMODEL.StandardNavigationCallExpCS;
 import net.mydreamy.requirementmodel.rEMODEL.StandardOperationExpCS;
 
-public class CallExpDealer extends OperationBodyContext{
+public class CallExpDealer extends FactoryContext {
 
+
+    public CallExpDealer(InitPack initPack) {
+        super(initPack);
+    }
 
     public static class PCGlobalVariable extends PCRet{
         public Variable variable;

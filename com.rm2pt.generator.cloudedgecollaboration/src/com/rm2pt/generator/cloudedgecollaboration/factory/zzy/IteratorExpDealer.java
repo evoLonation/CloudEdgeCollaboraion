@@ -11,11 +11,17 @@ import net.mydreamy.requirementmodel.rEMODEL.*;
 import java.util.List;
 
 // iteratorExp通常用于表达集合的操作
-public class IteratorExpDealer extends OperationBodyContext{
-    private final CallExpDealer callExpDealer = new CallExpDealer();
-    private final AssociationDealer associationDealer = new AssociationDealer();
-    private final LogicExpDealer logicExpDealer = new LogicExpDealer();
+public class IteratorExpDealer extends FactoryContext {
+    private final CallExpDealer callExpDealer;
+    private final AssociationDealer associationDealer;
+    private final LogicExpDealer logicExpDealer;
 
+    public IteratorExpDealer(InitPack initPack, CallExpDealer callExpDealer, AssociationDealer associationDealer, LogicExpDealer logicExpDealer) {
+        super(initPack);
+        this.callExpDealer = callExpDealer;
+        this.associationDealer = associationDealer;
+        this.logicExpDealer = logicExpDealer;
+    }
 
     // 处理集合的操作
     // 一个是转化为数据库的condition
@@ -52,7 +58,7 @@ public class IteratorExpDealer extends OperationBodyContext{
             isMulti = false;
         case "select()":
             var condition = new Condition(targetVar, source, internalVar, logicExpDealer.dealOCLExp(iteratorExp.getExp(), ExpType.COLLECTION), isMulti);
-            operationBody.addStatement(condition);
+            addStatement(condition);
             break;
         case "collect()":
             // todo
