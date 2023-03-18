@@ -31,4 +31,7 @@ public class OperationBodyFactory extends OperationBodyContext {
 
     }
 
+    public OperationBody getOperationBody() {
+        return operationBody;
+    }
 }
