@@ -1,6 +1,7 @@
 package com.rm2pt.generator.cloudedgecollaboration.info.operationBody.precondition;
 
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.logicExp.ExpType;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.logicExp.LogicExp;
 
 // 只有precondition用到
@@ -9,6 +10,7 @@ public class IsUndefinedExp extends LogicExp {
     private boolean isUndefined;
 
     public IsUndefinedExp(Variable variable, boolean isUndefined) {
+        super(ExpType.PRECONDITION);
         this.variable = variable;
         this.isUndefined = isUndefined;
         check();
@@ -32,8 +34,4 @@ public class IsUndefinedExp extends LogicExp {
         return isUndefined;
     }
 
-    @Override
-    public boolean mustPrecondition() {
-        return true;
-    }
 }

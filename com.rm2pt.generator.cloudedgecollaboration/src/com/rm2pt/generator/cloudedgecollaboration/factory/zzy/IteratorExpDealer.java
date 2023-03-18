@@ -4,7 +4,8 @@ package com.rm2pt.generator.cloudedgecollaboration.factory.zzy;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityTypeInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Condition;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.logicExp.ExpType;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.*;
 import net.mydreamy.requirementmodel.rEMODEL.*;
 
 import java.util.List;
@@ -12,83 +13,63 @@ import java.util.List;
 // iteratorExp通常用于表达集合的操作
 public class IteratorExpDealer extends OperationBodyContext{
     private final CallExpDealer callExpDealer = new CallExpDealer();
+    private final AssociationDealer associationDealer = new AssociationDealer();
+    private final LogicExpDealer logicExpDealer = new LogicExpDealer();
 
 
-    public static class IESelect{
-        // 待设置variable
-        public SelectBuilder selectBuilder;
-        public EntityInfo entityInfo;
-
-        public IESelect(SelectBuilder selectBuilder, EntityInfo entityInfo) {
-            this.selectBuilder = selectBuilder;
-            this.entityInfo = entityInfo;
-        }
-    }
     // 处理集合的操作
     // 一个是转化为数据库的condition
-    // todo 一个是对已有的集合执行操作
-    public IESelect dealIteratorExp(IteratorExpCS iteratorExp){
-        boolean isAllInstance;
-        EntityInfo entityInfo = null;
-        if(iteratorExp.getSimpleCall() != null){
-            // todo
-            throw new UnsupportedOperationException();
-        }else if(iteratorExp.getObjectCall() != null){
+    // 一个是对已有的集合执行操作
+    public void dealIteratorExp(IteratorExpCS iteratorExp, Variable targetVar) {
+        // 得到source
+        Source source;
+        if(iteratorExp.getSimpleCall() != null) {
+            source = new Collection(variableTable.getVariable(iteratorExp.getSimpleCall()));
+        } else if(iteratorExp.getObjectCall() != null) {
             var callExp = iteratorExp.getObjectCall();
-            if(callExp instanceof PropertyCallExpCS){
-                // todo
-                throw new UnsupportedOperationException();
+            if(callExp instanceof PropertyCallExpCS) {
+                // 必须是多关联
+                var ret = (CallExpDealer.PCAssociation)callExpDealer.dealPropertyCall((PropertyCallExpCS) callExp);
+                check(ret.association.isMulti());
+                var tempVar = variableTable.getTempVariable(ret.variable, ret.association);
+                // 先生成关联的获取操作
+                associationDealer.dealMultiAssGet(tempVar, ret.variable, ret.association);
+                source = new Collection(tempVar);
             } else if(callExp instanceof ClassiferCallExpCS) {
-                entityInfo = callExpDealer.dealClassiferCall((ClassiferCallExpCS) callExp);
-                isAllInstance = true;
+                var entityInfo = callExpDealer.dealClassiferCall((ClassiferCallExpCS) callExp);
+                source = new AllInstance(entityInfo);
+            } else{
+                throw new UnsupportedOperationException();
             }
         }else{
             throw new UnsupportedOperationException();
         }
-        String internalVar = dealVariables(iteratorExp.getVaribles(), entityInfo);
+
+        var internalVar = getInternalVar(iteratorExp.getVaribles(), source.getEntityInfo());
+        var isMulti = true;
         switch (iteratorExp.getIterator()) {
-            case "any()":
-
-            case "select()":
-            case "collect()":
-
-
-
+        case "any()":
+            isMulti = false;
+        case "select()":
+            var condition = new Condition(targetVar, source, internalVar, logicExpDealer.dealOCLExp(iteratorExp.getExp(), ExpType.COLLECTION), isMulti);
+            operationBody.addStatement(condition);
+            break;
+        case "collect()":
+            // todo
+        default: throw new UnsupportedOperationException();
         }
+        variableTable.removeInternalVar();
     }
 
-    private void dealVariables(List<VariableDeclarationCS> variableList, EntityInfo entityInfo) {
+    private Variable getInternalVar(List<VariableDeclarationCS> variableList, EntityInfo entityInfo) {
         check(variableList.size() == 1);
         var variable = variableList.get(0);
         var varName = variable.getName();
         var varType = getType(variable.getType());
         check(new EntityTypeInfo(entityInfo).equals(varType));
-        variableTable.addInternalVar(new Variable(varName, varType));
-    }
-
-    private Condition dealAnySelect(LogicFormulaExpCS logicFormulaExp, EntityInfo entityInfo) {
-        // left
-        check(logicFormulaExp.getAtomicexp().size() == 1);
-        var atomicExp = (AtomicExpression) logicFormulaExp.getAtomicexp().get(0);
-        check(atomicExp.getLeftside() instanceof PropertyCallExpCS);
-        var left = (PropertyCallExpCS) atomicExp.getLeftside();
-        check(left.getSelfproperty() == null);
-        check(left.getName().getSymbol().equals(variable));
-        var attribute = left.getAttribute();
-        check(entityInfo.getKeyType(attribute) == EntityInfo.KeyType.ATTRIBUTE);
-        // op
-        var opStr = atomicExp.getOp();
-        AtomicCondition.OP op;
-        switch (opStr){
-            case "=": op = AtomicCondition.OP.EQUALS; break;
-            // todo
-            default: throw new UnsupportedOperationException();
-        }
-        // right
-        var right = atomicExp.getRightside();
-
-        // todo exp (right的right）
-
+        var internal = new Variable(varName, varType, Variable.ScopeType.INTERNAL);
+        variableTable.addVariable(internal);
+        return internal;
     }
 
 }

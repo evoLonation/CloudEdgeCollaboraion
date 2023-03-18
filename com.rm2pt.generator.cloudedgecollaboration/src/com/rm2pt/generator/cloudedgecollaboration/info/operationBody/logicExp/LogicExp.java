@@ -7,5 +7,13 @@ package com.rm2pt.generator.cloudedgecollaboration.info.operationBody.logicExp;
  * 2、用于集合操作的Condition类，注意此时不能有UndefinedJudge，且存在一个internalVariable
  */
 public abstract class LogicExp {
-    public abstract boolean mustPrecondition();
+    public LogicExp(ExpType expType) {
+        this.expType = expType;
+    }
+
+    protected ExpType expType;
+
+    public ExpType getExpType() {
+        return expType;
+    }
 }

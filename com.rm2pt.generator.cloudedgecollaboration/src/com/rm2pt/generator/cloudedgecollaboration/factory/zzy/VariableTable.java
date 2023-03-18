@@ -14,6 +14,7 @@ import java.util.Map;
 public class VariableTable {
 
     private Map<String, Variable> variableMap;
+    private Map<String, Variable> tempVarMap;
     private Variable internalVar;
     private Map<Variable, List<String>> variableChangedMap;
     private Map<Variable, List<String>> variableUsedMap;
@@ -23,6 +24,7 @@ public class VariableTable {
         variableChangedMap = new HashMap<>();
         variableUsedMap = new HashMap<>();
         internalVar = null;
+        tempVarMap = new HashMap<>();
 
         addGlobalVariable(serviceInfo);
         addParamVariable(operation);
@@ -58,6 +60,24 @@ public class VariableTable {
         }
         variableMap.put(variable.getName(), variable);
     }
+
+    /**
+     * @return 没有则创建，有则直接拿
+     */
+    public Variable getTempVariable(Variable variable, EntityInfo.Association association) {
+        if(variable.mustGetEntity().getKeyType(association.getName()) == EntityInfo.KeyType.ASSOCIATION){
+            throw new UnsupportedOperationException();
+        }
+        var varName = variable.getName() + "@" + association.getName();
+        if(tempVarMap.containsKey(varName)){
+            return tempVarMap.get(varName);
+        }
+        var tempVariable = new Variable(variable.getName() + "@" + association.getName(), new EntityTypeInfo(association.getTargetEntity()), Variable.ScopeType.ASSTEMP);
+        addVariable(tempVariable);
+        tempVarMap.put(tempVariable.getName(), tempVariable);
+        return tempVariable;
+    }
+
 
     private void attributeChanged(Variable variable, String attribute){
         variableChangedMap.putIfAbsent(variable, new ArrayList<>());

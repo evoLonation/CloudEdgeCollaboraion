@@ -17,9 +17,9 @@ public class Variable {
         GLOBAL,
         DEFINITION,
         LET,
-        GENERATE,
         RETURN,
         INTERNAL,
+        ASSTEMP,
     }
     private ScopeType scopeType;
 
@@ -43,5 +43,8 @@ public class Variable {
 
     public EntityInfo mustGetEntity(){
         return ((EntityTypeInfo)type).getEntityInfo();
+    }
+    public BasicType mustGetBasicType(){
+        return ((BasicType)type);
     }
 }

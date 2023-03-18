@@ -1,16 +1,12 @@
 package com.rm2pt.generator.cloudedgecollaboration.info.operationBody.logicExp;
 
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.AttributeRef;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.RValue;
 
 public class AtomicExp extends LogicExp {
-    private AttributeRef left;
-    private AttributeRef right;
+    private RValue left;
+    private RValue right;
     private OP op;
 
-    @Override
-    public boolean mustPrecondition() {
-        return false;
-    }
     public enum OP{
         EQ,
         LT,
@@ -19,7 +15,8 @@ public class AtomicExp extends LogicExp {
         GE,
     }
 
-    public AtomicExp(AttributeRef left, AttributeRef right, OP op) {
+    public AtomicExp(RValue left, RValue right, OP op, ExpType expType) {
+        super(expType);
         this.left = left;
         this.right = right;
         this.op = op;
@@ -27,17 +24,17 @@ public class AtomicExp extends LogicExp {
     }
 
     private void check(){
-        if(left.getAttribute().getType().getTypeEnum().equals(right.getAttribute().getType().getTypeEnum())){
+        if(left.getType().getTypeEnum().equals(right.getType().getTypeEnum())){
             return;
         }
         throw new UnsupportedOperationException();
     }
 
-    public AttributeRef getLeft() {
+    public RValue getLeft() {
         return left;
     }
 
-    public AttributeRef getRight() {
+    public RValue getRight() {
         return right;
     }
 
