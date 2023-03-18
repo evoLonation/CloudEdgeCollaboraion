@@ -64,7 +64,7 @@ public class ServiceFactory {
             EList<Attribute> tempProperties = service.getTemp_property();
             List<Variable> variables = new ArrayList<Variable>();
             for (Attribute attribute : tempProperties) {
-                Variable variable = new Variable(attribute.getName(), convertTypeCSToType(attribute.getType()));
+                Variable variable = new Variable(attribute.getName(), convertTypeCSToType(attribute.getType()), Variable.ScopeType.GLOBAL);
                 variables.add(variable);
             }
             serviceInfo.setGlobalVariableList(variables);
@@ -81,7 +81,7 @@ public class ServiceFactory {
                 EList<Parameter> parameters = o.getParameter();
                 List<Variable> inputParamList = new ArrayList<Variable>();
                 for (Parameter p : parameters) {
-                    Variable variable = new Variable(p.getName(), convertTypeCSToType(p.getType()));
+                    Variable variable = new Variable(p.getName(), convertTypeCSToType(p.getType()), Variable.ScopeType.PARAM);
                     inputParamList.add(variable);
                 }
                 operation.setInputParamList(inputParamList);
@@ -97,8 +97,9 @@ public class ServiceFactory {
                     }
                 }
 
-                OperationBodyDeal operationBodyDeal = new OperationBodyDeal(serviceInfo, operation, contract, entityMap);
-                OperationBody operationBody = operationBodyDeal.getBody(contract);
+                OperationBodyFactory operationBodyFactory = new OperationBodyFactory(contract, operation, serviceInfo, entityMap);
+                operationBodyFactory.factory();
+                OperationBody operationBody = operationBodyFactory.getOperationBody();
                 operation.setOperationBody(operationBody);
 
                 operations.add(operation);
@@ -179,23 +180,22 @@ public class ServiceFactory {
 
     public Type convertTypeCSToType(TypeCS typeCS) {
         if (typeCS instanceof PrimitiveTypeCSImpl) {
-            BasicType type = new BasicType() {
-            };
+            BasicType type;
             switch (((PrimitiveTypeCSImpl) typeCS).getName()) {
                 case "Real":
-                    type.setTypeEnum(BasicType.TypeEnum.REAL);
+                    type = new BasicType(BasicType.TypeEnum.REAL);
                     break;
                 case "Integer":
-                    type.setTypeEnum(BasicType.TypeEnum.INTEGER);
+                    type = new BasicType(BasicType.TypeEnum.INTEGER);
                     break;
                 case "Date":
-                    type.setTypeEnum(BasicType.TypeEnum.TIME);
+                    type = new BasicType(BasicType.TypeEnum.TIME);
                     break;
                 case "Boolean":
-                    type.setTypeEnum(BasicType.TypeEnum.BOOLEAN);
+                    type = new BasicType(BasicType.TypeEnum.BOOLEAN);
                     break;
                 case "String":
-                    type.setTypeEnum(BasicType.TypeEnum.STRING);
+                    type = new BasicType(BasicType.TypeEnum.STRING);
                     break;
                 default:
                     throw new RuntimeException("Invalid PrimitiveTypeCS: " + ((PrimitiveTypeCSImpl) typeCS).getName());

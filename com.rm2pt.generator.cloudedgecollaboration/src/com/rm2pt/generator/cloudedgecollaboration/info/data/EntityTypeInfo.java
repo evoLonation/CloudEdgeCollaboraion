@@ -10,4 +10,9 @@ public class EntityTypeInfo extends Type{
     public EntityTypeInfo(EntityInfo entityInfo) {
         this.entityInfo = entityInfo;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return ((EntityTypeInfo)obj).entityInfo.equals(entityInfo);
+    }
 }

@@ -11,16 +11,26 @@ package com.rm2pt.generator.cloudedgecollaboration.info.data;
 public class Variable {
     private String name;
     private Type type;
-    public void setName(String name){
-        this.name = name;
+    // todo lyz需要设置一下
+    public enum ScopeType {
+        PARAM,
+        GLOBAL,
+        DEFINITION,
+        LET,
+        RETURN,
+        INTERNAL,
+        ASSTEMP,
     }
-    public void setType(Type type){
+    private ScopeType scopeType;
+
+    public Variable(String name, Type type, ScopeType scopeType) {
+        this.name = name;
         this.type = type;
+        this.scopeType = scopeType;
     }
 
-    public Variable(String name, Type type) {
-        this.name = name;
-        this.type = type;
+    public ScopeType getScopeType() {
+        return scopeType;
     }
 
     public String getName() {
@@ -29,5 +39,12 @@ public class Variable {
 
     public Type getType() {
         return type;
+    }
+
+    public EntityInfo mustGetEntity(){
+        return ((EntityTypeInfo)type).getEntityInfo();
+    }
+    public BasicType mustGetBasicType(){
+        return ((BasicType)type);
     }
 }
