@@ -11,7 +11,9 @@ public class ServiceInfo {
     private List<Operation> operationList;
     // Nullable
     private Logic logic;
+    // todo delete
     private Location location;
+    // todo delete
     public enum InteractiveType{
         NORMAL,  // 没有Logic
         LOGICNORETURN,  //其Logic没有返回值

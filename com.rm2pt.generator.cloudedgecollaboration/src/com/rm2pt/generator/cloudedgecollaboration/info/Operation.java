@@ -44,5 +44,12 @@ public class Operation {
     public void setOperationBody(OperationBody operationBody) {
         this.operationBody = operationBody;
     }
+
+    //todo lyz add logic
+    public enum ConcurrencyType{
+        HIGHPRIORITY,
+        WEAKCONSISTENCY,
+        DEFAULT,
+    }
 }
 

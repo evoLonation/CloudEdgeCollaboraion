@@ -8,7 +8,7 @@ import java.util.List;
  * 生成mysql相关的d8s部署文件
  */
 public class MysqlGenerator {
-    public MysqlGenerator(List<EntityInfo> EntityInfoList){
+    public MysqlGenerator(List<EntityInfo> EntityInfoList, int replicationNumber, int shardingDB, int shardingTable){
 
     }
     // todo implement

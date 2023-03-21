@@ -32,13 +32,13 @@ public class Processor {
         EntityFactory entityFactory = new EntityFactory(domainModel.getEntity());
         entityFactory.factory();
 		new EntityPackageGenerator(entityFactory.getEntityList()).generate();
-		new MysqlGenerator(entityFactory.getEntityList()).generate();
+		new MysqlGenerator(entityFactory.getEntityList(), 3, 3, 3).generate();
+		new ConfigPackageGenerator(3, 3, 3);
 
         ServiceFactory serviceFactory = new ServiceFactory(useCaseModel.getInteraction(), useCaseModel.getService(), useCaseModel.getContract(), entityFactory.getEntityMap());
 //        serviceFactory.factory();
 		new ServicePackageGenerator(serviceFactory.getServiceList());
 
-        new ConfigPackageGenerator();
 
 
 
