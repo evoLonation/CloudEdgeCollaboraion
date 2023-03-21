@@ -10,6 +10,7 @@ import com.rm2pt.generator.cloudedgecollaboration.common.Keyworder;
 import java.util.ArrayList;
 import java.util.List;
 
+// todo 不要直接生成.sql文件，而是配合MysqlGenerator生成部署文件
 public class DDLGenerator extends Generator {
     private final List<EntityInfo> infoList;
     private final List<EntityStr> SQLCloudEntityList, SQLEdgeEntityList;

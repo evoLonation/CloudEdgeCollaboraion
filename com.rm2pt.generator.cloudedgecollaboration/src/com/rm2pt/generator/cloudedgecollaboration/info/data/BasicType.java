@@ -21,6 +21,7 @@ public class BasicType extends Type{
     public BasicType(TypeEnum typeEnum) {
         this.typeEnum = typeEnum;
     }
+    public BasicType(){}
 
     @Override
     public boolean equals(Object obj) {

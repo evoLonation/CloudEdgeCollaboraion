@@ -32,7 +32,7 @@ public class Processor {
         EntityFactory entityFactory = new EntityFactory(domainModel.getEntity());
         entityFactory.factory();
 		new EntityPackageGenerator(entityFactory.getEntityList()).generate();
-		new DDLGenerator(entityFactory.getEntityList()).generate();
+		new MysqlGenerator(entityFactory.getEntityList()).generate();
 
         ServiceFactory serviceFactory = new ServiceFactory(useCaseModel.getInteraction(), useCaseModel.getService(), useCaseModel.getContract(), entityFactory.getEntityMap());
 //        serviceFactory.factory();

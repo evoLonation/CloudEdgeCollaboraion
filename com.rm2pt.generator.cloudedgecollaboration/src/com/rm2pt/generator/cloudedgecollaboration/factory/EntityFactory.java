@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// todo lyh 更改storagetype的相关逻辑，现在需要对几个类特化处理，后期可能会增加标注
 /**
  * 用于将需求模型的Entity转换为EntityInfo
  */

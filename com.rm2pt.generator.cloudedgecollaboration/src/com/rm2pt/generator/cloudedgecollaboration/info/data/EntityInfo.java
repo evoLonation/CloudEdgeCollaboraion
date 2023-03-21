@@ -14,9 +14,14 @@ public class EntityInfo {
     private List<Association> associationList;
 
     public enum StorageType {
+        // todo delete
         CLOUD,
         EDGE,
-        CACHE
+        CACHE,
+        // todo new logic
+        DEFAULT,
+        HIGHREAD, // 主从复制
+        HIGHSTORE, // 分库分表
     }
 
     public String getName() {
