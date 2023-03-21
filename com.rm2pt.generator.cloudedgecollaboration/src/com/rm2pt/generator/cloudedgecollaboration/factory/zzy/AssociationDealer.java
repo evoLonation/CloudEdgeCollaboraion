@@ -12,17 +12,21 @@ import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.statement.A
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.AttributeRef;
 
 // 用于处理关联的引用、赋值等等
-public class AssociationDealer extends OperationBodyContext{
+public class AssociationDealer extends FactoryContext {
 
-    public void dealSingleAssAssign(Variable variable, EntityInfo.ForeignKeyAss association, Variable sourceVar) {
-        checkAssign(sourceVar, variable, association, false);
+    public AssociationDealer(InitPack initPack) {
+        super(initPack);
+    }
+
+    public void dealSingleAssAssign(Variable variable, EntityInfo.Association association, Variable sourceVar) {
+        checkRelation(sourceVar, variable, association, false);
         var entityInfo = variable.mustGetEntity();
         var sourceEntity = sourceVar.mustGetEntity();
         // 如果单关联是自己的外键
         var assign = new Assign(
-                new AttributeRef(variable, entityInfo.getAttribute((association).getRefAttrName())),
+                new AttributeRef(variable, entityInfo.getAttribute(((EntityInfo.ForeignKeyAss)association).getRefAttrName())),
                 new AttributeRef(sourceVar, sourceEntity.getIdAttribute()));
-        operationBody.addStatement(assign);
+        addStatement(assign);
         // todo 如果单关联是对方的unique外键
     }
 
@@ -40,7 +44,7 @@ public class AssociationDealer extends OperationBodyContext{
     }
 
     public void dealSingleAssGet(Variable variable, Variable sourceVar, EntityInfo.ForeignKeyAss sourceAss) {
-        checkAssign(variable, sourceVar, sourceAss, false);
+        checkRelation(variable, sourceVar, sourceAss, false);
         var sourceEntity = sourceAss.getTargetEntity();
         var targetEntity = variable.mustGetEntity();
         check(sourceEntity.equals(targetEntity));
@@ -52,11 +56,11 @@ public class AssociationDealer extends OperationBodyContext{
                 ExpType.COLLECTION);
         var condition = new Condition(variable, new AllInstance(targetEntity), internal, exp, false);
         variableTable.removeInternalVar();
-        operationBody.addStatement(condition);
+        addStatement(condition);
     }
 
     public void dealMultiAssGet(Variable variable, Variable sourceVar, EntityInfo.Association sourceAss) {
-        checkAssign(variable, sourceVar, sourceAss, true);
+        checkRelation(variable, sourceVar, sourceAss, true);
         var sourceEntity = sourceAss.getTargetEntity();
         var targetEntity = variable.mustGetEntity();
         check(sourceEntity.equals(targetEntity));
@@ -69,16 +73,16 @@ public class AssociationDealer extends OperationBodyContext{
                     ExpType.COLLECTION);
             var condition = new Condition(variable, new AllInstance(targetEntity), internal, exp, true);
             variableTable.removeInternalVar();
-            operationBody.addStatement(condition);
+            addStatement(condition);
         }else{
             // todo join table
             throw new UnsupportedOperationException();
         }
     }
 
-    private void checkAssign(Variable variable, Variable sourceVar, EntityInfo.Association sourceAss, boolean isMulti){
+    private void checkRelation(Variable targetVar, Variable sourceVar, EntityInfo.Association sourceAss, boolean isMulti){
         check(sourceAss.isMulti() == isMulti);
-        checkVariable(variable, sourceAss);
+        checkVariable(targetVar, sourceAss);
         checkCorrespond(sourceVar, sourceAss);
     }
 

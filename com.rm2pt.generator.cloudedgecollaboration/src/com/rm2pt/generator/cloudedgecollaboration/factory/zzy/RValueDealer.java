@@ -1,17 +1,18 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory.zzy;
 
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.BasicVariable;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.BinaryValue;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.UnaryValue;
-import net.mydreamy.requirementmodel.rEMODEL.AtomicExpression;
-import net.mydreamy.requirementmodel.rEMODEL.LiteralExpCS;
-import net.mydreamy.requirementmodel.rEMODEL.PropertyCallExpCS;
-import net.mydreamy.requirementmodel.rEMODEL.VariableExpCS;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.*;
+import net.mydreamy.requirementmodel.rEMODEL.*;
 import org.eclipse.emf.ecore.EObject;
 
 // 字面量、属性、变量的基本类型值处理
-public class RValueDealer extends OperationBodyContext{
-    private CallExpDealer callExpDealer = new CallExpDealer();
+public class RValueDealer extends FactoryContext {
+    private final CallExpDealer callExpDealer;
+
+    public RValueDealer(InitPack initPack, CallExpDealer callExpDealer) {
+        super(initPack);
+        this.callExpDealer = callExpDealer;
+    }
+
     public UnaryValue getUnaryValue(EObject exp){
         if(exp instanceof PropertyCallExpCS){
             var ret = callExpDealer.dealPropertyCall((PropertyCallExpCS) exp);
@@ -24,9 +25,8 @@ public class RValueDealer extends OperationBodyContext{
             }
         } else if(exp instanceof VariableExpCS){
             return new BasicVariable(variableTable.getVariable(((VariableExpCS) exp).getSymbol()));
-        } else if(exp instanceof LiteralExpCS) {
-            // todo 字面量
-            throw new UnsupportedOperationException();
+        } else if(exp instanceof PrimitiveLiteralExpCS) {
+            return getLiteralValue((PrimitiveLiteralExpCS) exp);
         } else if(exp instanceof AtomicExpression){
             check(((AtomicExpression) exp).getInfixop() == null);
             return getUnaryValue(((AtomicExpression) exp).getLeftside());
@@ -44,6 +44,18 @@ public class RValueDealer extends OperationBodyContext{
             default:throw new UnsupportedOperationException();
         }
         return new BinaryValue(getUnaryValue(exp1), getUnaryValue(exp2), op);
+    }
+    public LiteralValue getLiteralValue(PrimitiveLiteralExpCS literalExp){
+        if(literalExp instanceof BooleanLiteralExpCS){
+            switch (literalExp.getSymbol()){
+                case "true": return new Bool(true);
+                case "false" : return new Bool(false);
+                default: throw new UnsupportedOperationException();
+            }
+        } else {
+            // todo 其他字面量
+            throw new UnsupportedOperationException();
+        }
     }
 
 }

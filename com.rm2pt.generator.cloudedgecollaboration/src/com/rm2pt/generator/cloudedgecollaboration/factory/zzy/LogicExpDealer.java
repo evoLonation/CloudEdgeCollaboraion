@@ -11,10 +11,16 @@ import net.mydreamy.requirementmodel.rEMODEL.*;
 import java.util.stream.Collectors;
 
 // 用于处理precondition部分或者集合操作部分的逻辑判断
-public class LogicExpDealer extends OperationBodyContext{
+public class LogicExpDealer extends FactoryContext {
 
-    private CallExpDealer callExpDealer = new CallExpDealer();
-    private RValueDealer rValueDealer = new RValueDealer();
+    private final CallExpDealer callExpDealer;
+    private final RValueDealer rValueDealer;
+
+    public LogicExpDealer(InitPack initPack, CallExpDealer callExpDealer, RValueDealer rValueDealer) {
+        super(initPack);
+        this.callExpDealer = callExpDealer;
+        this.rValueDealer = rValueDealer;
+    }
 
     public LogicExp dealOCLExp(OCLExpressionCS oclExpressionCS, ExpType type){
         if(oclExpressionCS instanceof LogicFormulaExpCS){

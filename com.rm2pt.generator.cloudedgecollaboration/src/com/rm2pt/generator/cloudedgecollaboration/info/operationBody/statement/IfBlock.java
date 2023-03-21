@@ -7,5 +7,9 @@ import java.util.List;
 public class IfBlock extends Statement {
     private LogicExp condition;
     private List<Statement> ifTrue;
-    private List<Statement> elseTrue;
+
+    public IfBlock(LogicExp condition, List<Statement> ifTrue) {
+        this.condition = condition;
+        this.ifTrue = ifTrue;
+    }
 }
