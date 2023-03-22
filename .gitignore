@@ -7,3 +7,4 @@
 *.feature
 *.updatesite
 **/*.iml
+**/.classpath
