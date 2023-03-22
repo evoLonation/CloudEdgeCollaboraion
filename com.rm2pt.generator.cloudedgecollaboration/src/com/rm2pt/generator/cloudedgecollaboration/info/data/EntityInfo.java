@@ -3,7 +3,7 @@ package com.rm2pt.generator.cloudedgecollaboration.info.data;
 import java.util.List;
 import java.util.Map;
 
-public class EntityInfo {
+public class EntityInfo implements Cloneable{
     private String name;
     private StorageType storageType;
     private Attribute idAttribute;
@@ -13,11 +13,16 @@ public class EntityInfo {
     private List<Attribute> attributeList;
     private List<Association> associationList;
 
+    @Override
+    public EntityInfo clone() {
+        try {
+            return (EntityInfo) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
+
     public enum StorageType {
-        // todo delete
-        CLOUD,
-        EDGE,
-        CACHE,
         // todo new logic
         // Shop类HighStore, Item类HighRead
         DEFAULT,

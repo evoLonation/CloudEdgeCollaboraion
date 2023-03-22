@@ -1,34 +1,34 @@
 package com.rm2pt.generator.cloudedgecollaboration.generator;
 
 
+import com.rm2pt.generator.cloudedgecollaboration.common.Keyworder;
 import com.rm2pt.generator.cloudedgecollaboration.generator.lyh.AttributeStr;
 import com.rm2pt.generator.cloudedgecollaboration.generator.lyh.EntityStr;
 import com.rm2pt.generator.cloudedgecollaboration.generator.lyh.EntityTemplate;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
-import com.rm2pt.generator.cloudedgecollaboration.common.Keyworder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 // todo 不要直接生成.sql文件，而是配合MysqlGenerator生成部署文件
-public class DDLGenerator extends Generator {
+public class DDLGenerator{
     private final List<EntityInfo> infoList;
-    private final List<EntityStr> SQLCloudEntityList, SQLEdgeEntityList;
-    private String SQLText;
+    private final List<EntityStr> DDLEntityList;
+    private String DDLText;
 
     public DDLGenerator(List<EntityInfo> EntityInfoList) {
         infoList = new ArrayList<>();
         infoList.addAll(EntityInfoList);
-        SQLText = "";
-        SQLCloudEntityList = new ArrayList<>();
-        SQLEdgeEntityList = new ArrayList<>();
+        DDLText = "";
+        DDLEntityList = new ArrayList<>();
+    }
+    public String getDDLText() {
+        return DDLText;
     }
 
-    @Override
     public void generate() {
         for (EntityInfo entityInfo : infoList) {
             String entityName = entityInfo.getName();
-            String storageType = entityInfo.getStorageType().name();
 
             String idName = entityInfo.getIdAttribute().getName();
             String idType = entityInfo.getIdAttribute().getType().getTypeEnum().name();
@@ -63,23 +63,15 @@ public class DDLGenerator extends Generator {
             }
 
             EntityStr entityStr = new EntityStr(entityName, primaryKey, attributes);
-            if (storageType.equals(EntityInfo.StorageType.EDGE.name())){
-                SQLEdgeEntityList.add(entityStr);
-            }else {
-                SQLCloudEntityList.add(entityStr);
-            }
+            DDLEntityList.add(entityStr);
         }
-        SQLText = EntityTemplate.SQLContext(SQLCloudEntityList);
-        generateFile("build/cloud.sql", SQLText);
-        SQLText = EntityTemplate.SQLContext(SQLEdgeEntityList);
-        generateFile("build/edge.sql", SQLText);
-        System.out.println("Generated_DDL");
+        DDLText = EntityTemplate.SQLContext(DDLEntityList);
     }
 
     private String basicType2SQLType(String type) {
         switch (type) {
             case "INTEGER":
-                return "INT";
+                return "INT64";
             case "TIME":
                 return "DATETIME";
             case "REAL":

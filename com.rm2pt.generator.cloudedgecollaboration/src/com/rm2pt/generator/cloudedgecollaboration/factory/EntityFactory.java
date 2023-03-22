@@ -38,7 +38,7 @@ public class EntityFactory {
             List<Attribute> attrs = entity.getAttributes();
             List<Invariance> invs = entity.getInvariance();
             EntityInfo.Attribute id = getUniqueId(attrs, invs);
-            EntityInfo.StorageType type = getStorageType(attrs);
+            EntityInfo.StorageType type = getStorageTypeByName(name);
             List<EntityInfo.Attribute> attributes = new ArrayList<>();
             attributes.add(id);
             for (Attribute attr : attrs) {
@@ -54,15 +54,6 @@ public class EntityFactory {
             info.setName(name);
             info.setAttributeList(attributes);
             info.setStorageType(type);
-            if (type.equals(EntityInfo.StorageType.EDGE)){ // add EdgeId
-                EntityInfo.Attribute edgeId = new EntityInfo.Attribute();
-                edgeId.setName("EdgeId");
-                BasicType edgeIdType = new BasicType();
-                edgeIdType.setTypeEnum(TypeEnum.INTEGER);
-                edgeIdType.setMulti(false);
-                edgeId.setType(edgeIdType);
-                info.addAttribute(edgeId);
-            }
             this.infoList.add(info);
         }
         addRef2Association();
@@ -100,6 +91,17 @@ public class EntityFactory {
                 System.out.println("--assoRefName: " + ((EntityInfo.ForeignKeyAss) association).getRefAttrName());
                 System.out.println("--assoRefType: " + ((EntityInfo.ForeignKeyAss) association).getType().getTypeEnum().name());
             }
+        }
+    }
+
+    private EntityInfo.StorageType getStorageTypeByName(String name){ //Temp void
+        switch (name){
+            case "Item":
+                return EntityInfo.StorageType.HIGHREAD;
+            case "Shop":
+                return EntityInfo.StorageType.HIGHSTORE;
+            default:
+                return EntityInfo.StorageType.DEFAULT;
         }
     }
 
@@ -150,27 +152,6 @@ public class EntityFactory {
             }
         }
         throw new RuntimeException("No matched EntityInfo to: " + entity.getName());
-    }
-
-    private EntityInfo.StorageType getStorageType(List<Attribute> attrs) {
-        for (Attribute attr : attrs) {
-            if (attr.getName().equals("Type")) {
-                if (!(attr.getType() instanceof EnumEntityImpl)) {
-                    throw new RuntimeException("Type attr is not EnumEntityImpl");
-                }
-                switch (((EnumEntityImpl) attr.getType()).getName()) {
-                    case "Cloud":
-                        return EntityInfo.StorageType.CLOUD;
-                    case "Cache":
-                        return EntityInfo.StorageType.CACHE;
-                    case "Edge":
-                        return EntityInfo.StorageType.EDGE;
-                    default:
-                        throw new RuntimeException("Unknown StorageType: " + ((EnumEntityImpl) attr.getType()).getName());
-                }
-            }
-        }
-        throw new RuntimeException("No StorageType found");
     }
 
     private EntityInfo.Attribute getUniqueId(List<Attribute> attrs, List<Invariance> invs) { // UniqueId is guaranteed to be like "UniqueXXX", and XXX must be an attribute
