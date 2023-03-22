@@ -64,14 +64,14 @@ public class EntityPackageGenerator extends Generator {
             GOEntityList.add(entityStr);
         }
         GOText = EntityTemplate.GOContext(GOEntityList);
-        generateFile("entity.go", GOText);
+        generateFile("entity/entity.go", GOText);
         System.out.println("Generated_GO");
     }
 
     private String basicType2GOType(String type) {
         switch (type) {
             case "INTEGER":
-                return "int32";
+                return "int64";
             case "TIME":
                 return "time.Time";
             case "REAL":
