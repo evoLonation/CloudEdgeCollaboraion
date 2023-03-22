@@ -1,8 +1,10 @@
 package com.rm2pt.generator.cloudedgecollaboration;
 import com.rm2pt.generator.cloudedgecollaboration.common.Keyworder;
 import com.rm2pt.generator.cloudedgecollaboration.factory.EntityFactory;
+import com.rm2pt.generator.cloudedgecollaboration.factory.GlobalInfoBuilder;
 import com.rm2pt.generator.cloudedgecollaboration.factory.ServiceFactory;
 import com.rm2pt.generator.cloudedgecollaboration.generator.*;
+import com.rm2pt.generator.cloudedgecollaboration.info.GlobalInfo;
 import net.mydreamy.requirementmodel.rEMODEL.DomainModel;
 import net.mydreamy.requirementmodel.rEMODEL.UseCaseModel;
 
@@ -27,26 +29,18 @@ public class Processor {
     public void process(){
     	
     	System.out.println(Keyworder.camelToUnderScore("MyNameIsZzy"));
-    	
+
+		GlobalInfo globalInfo = new GlobalInfoBuilder().build();
         // 中间代码生成阶段
         EntityFactory entityFactory = new EntityFactory(domainModel.getEntity());
         entityFactory.factory();
 		new EntityPackageGenerator(entityFactory.getEntityList()).generate();
-		new MysqlGenerator(entityFactory.getEntityList(), 3, 3, 3).generate();
-		new ConfigPackageGenerator(3, 3, 3);
+		new MysqlGenerator(entityFactory.getEntityList(), globalInfo).generate();
+		new ConfigPackageGenerator(globalInfo);
 
         ServiceFactory serviceFactory = new ServiceFactory(useCaseModel.getInteraction(), useCaseModel.getService(), useCaseModel.getContract(), entityFactory.getEntityMap());
 //        serviceFactory.factory();
 		new ServicePackageGenerator(serviceFactory.getServiceList());
-
-
-
-
-		// todo zzy
-//        new RpcPackageGenerator(serviceFactory.getRpcServiceList());
-//
-//        new ListenPackageGenerator(serviceFactory.getNormalServiceList(), serviceFactory.getMqttServiceList(), serviceFactory.getHttpServiceList());
-
 
     }
 }

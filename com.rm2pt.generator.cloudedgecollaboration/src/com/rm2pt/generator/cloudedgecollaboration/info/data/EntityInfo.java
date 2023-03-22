@@ -19,6 +19,7 @@ public class EntityInfo {
         EDGE,
         CACHE,
         // todo new logic
+        // Shop类HighStore, Item类HighRead
         DEFAULT,
         HIGHREAD, // 主从复制
         HIGHSTORE, // 分库分表

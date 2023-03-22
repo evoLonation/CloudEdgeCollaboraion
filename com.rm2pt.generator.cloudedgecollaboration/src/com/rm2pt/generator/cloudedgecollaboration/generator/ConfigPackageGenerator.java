@@ -1,8 +1,10 @@
 package com.rm2pt.generator.cloudedgecollaboration.generator;
 
+import com.rm2pt.generator.cloudedgecollaboration.info.GlobalInfo;
+
 // todo zzy
 public class ConfigPackageGenerator extends Generator{
-    public ConfigPackageGenerator(int replicationNumber, int shardingDB, int shardingTable) {
+    public ConfigPackageGenerator(GlobalInfo globalInfo) {
 
     }
 
