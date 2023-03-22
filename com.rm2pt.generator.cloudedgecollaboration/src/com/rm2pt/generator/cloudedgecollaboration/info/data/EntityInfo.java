@@ -179,4 +179,8 @@ public class EntityInfo {
     public Association getAssociation(String name) {
         return associationMap.get(name);
     }
+
+    public boolean isOwner(Attribute attribute){
+        return associationMap.get(attribute.getName()) != null;
+    }
 }
