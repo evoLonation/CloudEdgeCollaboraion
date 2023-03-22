@@ -7,7 +7,7 @@ import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBo
 
 import java.util.List;
 
-public class Operation {
+public class OperationInfo {
     private String name;
     private List<Variable> inputParamList;
     private Type returnType;
@@ -45,11 +45,16 @@ public class Operation {
         this.operationBody = operationBody;
     }
 
-    //todo lyz add logic
+    // todo lyz add logic
     public enum ConcurrencyType{
         HIGHPRIORITY,
         WEAKCONSISTENCY,
         DEFAULT,
+    }
+    private ConcurrencyType concurrencyType;
+
+    public ConcurrencyType getConcurrencyType() {
+        return concurrencyType;
     }
 }
 

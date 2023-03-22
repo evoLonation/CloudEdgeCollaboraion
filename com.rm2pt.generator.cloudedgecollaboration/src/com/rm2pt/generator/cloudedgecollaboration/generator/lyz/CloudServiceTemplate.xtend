@@ -7,7 +7,7 @@ import com.rm2pt.generator.cloudedgecollaboration.generator.lyz.ServiceParser
 import com.rm2pt.generator.cloudedgecollaboration.generator.lyz.GolangOperation
 
 class CloudServiceTemplate {
-	static def String generateService(ServiceInfo service, List<Variable> globalVariableList, List<GolangOperation> operationList) {
+	static def String generateService(ServiceInfo service, List<Variable> globalVariableList, List<GolangOperation> operationInfoList) {
 		'''
 		package service
 
@@ -24,17 +24,17 @@ class CloudServiceTemplate {
 			«ENDFOR»
 		}
 
-		«FOR operation : operationList»
-		func (p *«service.getName()») «operation.getName()»(«ServiceParser.parseOperationParameter(operation)») error {
-			«IF operation.isPublic()»
-			«FOR op : ServiceParser.parseOperationErr(service, operationList, operation)»
+		«FOR operationInfo : operationInfoList»
+		func (p *«service.getName()») «operationInfo.getName()»(«ServiceParser.parseOperationParameter(operationInfo)») error {
+			«IF operationInfo.isPublic()»
+			«FOR op : ServiceParser.parseOperationErr(service, operationInfoList, operationInfo)»
 			if err := p.«op.getName()»(«ServiceParser.parseOperationParameterWithoutType(op)»); err != nil {
 				return errors.Wrap(err, "«op.getName()» error")
 			}
 			«ENDFOR»
 			«ENDIF»
 			
-			«FOR stmt : operation.getOperationBody().getStatementList()»
+			«FOR stmt : operationInfo.getOperationBody().getStatementList()»
 				«stmt.toString()»
 			«ENDFOR»
 		}

@@ -1,9 +1,9 @@
 package com.rm2pt.generator.cloudedgecollaboration.generator.lyz;
 
 import com.rm2pt.generator.cloudedgecollaboration.common.Keyworder;
-import com.rm2pt.generator.cloudedgecollaboration.info.Operation;
+import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
 
-public class GolangOperation extends Operation {
+public class GolangOperation extends OperationInfo {
     public enum OperationScope {
         PUBLIC,
         PRIVATE
@@ -11,16 +11,16 @@ public class GolangOperation extends Operation {
 
     private OperationScope operationScope;
 
-    public GolangOperation(Operation operation, OperationScope operationScope) {
+    public GolangOperation(OperationInfo operationInfo, OperationScope operationScope) {
         this.operationScope = OperationScope.PUBLIC;
         if (operationScope == OperationScope.PRIVATE) {
-            this.setName(Keyworder.firstLowerCase(operation.getName()));
+            this.setName(Keyworder.firstLowerCase(operationInfo.getName()));
         } else {
-            this.setName(Keyworder.firstUpperCase(operation.getName()));
+            this.setName(Keyworder.firstUpperCase(operationInfo.getName()));
         }
-        this.setInputParamList(operation.getInputParamList());
-        this.setReturnType(operation.getReturnType());
-        this.setOperationBody(operation.getOperationBody());
+        this.setInputParamList(operationInfo.getInputParamList());
+        this.setReturnType(operationInfo.getReturnType());
+        this.setOperationBody(operationInfo.getOperationBody());
     }
 
     public OperationScope getOperationScope() {

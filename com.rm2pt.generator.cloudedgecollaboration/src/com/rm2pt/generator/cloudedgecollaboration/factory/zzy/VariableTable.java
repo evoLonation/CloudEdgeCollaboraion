@@ -1,6 +1,6 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory.zzy;
 
-import com.rm2pt.generator.cloudedgecollaboration.info.Operation;
+import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityTypeInfo;
@@ -19,7 +19,7 @@ public class VariableTable {
     private Map<Variable, List<String>> variableChangedMap;
     private Map<Variable, List<String>> variableUsedMap;
 
-    public VariableTable(ServiceInfo serviceInfo, Operation operation) {
+    public VariableTable(ServiceInfo serviceInfo, OperationInfo operationInfo) {
         variableMap = new HashMap<>();
         variableChangedMap = new HashMap<>();
         variableUsedMap = new HashMap<>();
@@ -27,16 +27,16 @@ public class VariableTable {
         tempVarMap = new HashMap<>();
 
         addGlobalVariable(serviceInfo);
-        addParamVariable(operation);
+        addParamVariable(operationInfo);
     }
     private void addGlobalVariable(ServiceInfo serviceInfo){
         serviceInfo.getGlobalVariableList()
                 .forEach(this::addVariable);
     }
-    private void addParamVariable(Operation operation){
-        operation.getInputParamList()
+    private void addParamVariable(OperationInfo operationInfo){
+        operationInfo.getInputParamList()
                 .forEach(this::addVariable);
-        Variable returnVar = new Variable("result", operation.getReturnType(), Variable.ScopeType.RETURN);
+        Variable returnVar = new Variable("result", operationInfo.getReturnType(), Variable.ScopeType.RETURN);
         addVariable(returnVar);
     }
 

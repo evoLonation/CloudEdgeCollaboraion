@@ -20,9 +20,6 @@ public class OperationBody {
         return location;
     }
 
-    public List<Statement> getStatementList() {
-        return statementList;
-    }
 
     public List<Statement> getStatementList() {
         return statementList;

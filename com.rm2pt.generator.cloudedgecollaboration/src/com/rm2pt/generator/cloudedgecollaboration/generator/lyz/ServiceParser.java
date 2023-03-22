@@ -1,6 +1,6 @@
 package com.rm2pt.generator.cloudedgecollaboration.generator.lyz;
 
-import com.rm2pt.generator.cloudedgecollaboration.info.Operation;
+import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.*;
 
@@ -37,10 +37,10 @@ public class ServiceParser {
     }
 
     public static List<GolangOperation> parseOperationErr(ServiceInfo service, List<GolangOperation> operationList, GolangOperation operation) {
-        List<Operation> ops = service.getOperationList();
+        List<OperationInfo> ops = service.getOperationList();
         List<GolangOperation> goOps = new ArrayList<>();
         for (int i = 0; i < ops.size(); i++) {
-            Operation op = ops.get(i);
+            OperationInfo op = ops.get(i);
             goOps.add(operationList.get(i));
             if (op.getName().equals(operation.getName())) {
                 break;

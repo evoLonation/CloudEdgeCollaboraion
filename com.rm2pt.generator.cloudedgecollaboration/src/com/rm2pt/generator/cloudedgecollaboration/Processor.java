@@ -5,6 +5,7 @@ import com.rm2pt.generator.cloudedgecollaboration.factory.GlobalInfoBuilder;
 import com.rm2pt.generator.cloudedgecollaboration.factory.ServiceFactory;
 import com.rm2pt.generator.cloudedgecollaboration.generator.*;
 import com.rm2pt.generator.cloudedgecollaboration.info.GlobalInfo;
+import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
 import net.mydreamy.requirementmodel.rEMODEL.DomainModel;
 import net.mydreamy.requirementmodel.rEMODEL.UseCaseModel;
 
@@ -36,11 +37,13 @@ public class Processor {
         entityFactory.factory();
 		new EntityPackageGenerator(entityFactory.getEntityList()).generate();
 		new MysqlGenerator(entityFactory.getEntityList(), globalInfo).generate();
-		new ConfigPackageGenerator(globalInfo);
+		ServiceFactory serviceFactory = new ServiceFactory(useCaseModel.getInteraction(), useCaseModel.getService(), useCaseModel.getContract(), entityFactory.getEntityMap());
+        serviceFactory.factory();
+		new ServicePackageGenerator(serviceFactory.getServiceList(),
+				serviceFactory.getOperation(OperationInfo.ConcurrencyType.HIGHPRIORITY)).generate();
 
-        ServiceFactory serviceFactory = new ServiceFactory(useCaseModel.getInteraction(), useCaseModel.getService(), useCaseModel.getContract(), entityFactory.getEntityMap());
-//        serviceFactory.factory();
-		new ServicePackageGenerator(serviceFactory.getServiceList());
+		// todo configpackage, redisdeploy, commonpackage, serverpackage, highprioritypackage, etcpackage 's generate
+
 
     }
 }

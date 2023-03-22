@@ -2,6 +2,7 @@ package com.rm2pt.generator.cloudedgecollaboration.factory;
 
 import com.rm2pt.generator.cloudedgecollaboration.info.Location;
 import com.rm2pt.generator.cloudedgecollaboration.info.Logic;
+import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.*;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBody;
@@ -70,13 +71,13 @@ public class ServiceFactory {
             serviceInfo.setGlobalVariableList(variables);
 
             EList<Operation> operationEList = service.getOperation();
-            List<com.rm2pt.generator.cloudedgecollaboration.info.Operation> operations
+            List<OperationInfo> operationInfos
                     = new ArrayList<>();
-            Map<String, com.rm2pt.generator.cloudedgecollaboration.info.Operation> operationMap
+            Map<String, OperationInfo> operationMap
                     = new HashMap<>();
             for (Operation o : operationEList) {
-                com.rm2pt.generator.cloudedgecollaboration.info.Operation operation = new com.rm2pt.generator.cloudedgecollaboration.info.Operation();
-                operation.setName(o.getName());
+                OperationInfo operationInfo = new OperationInfo();
+                operationInfo.setName(o.getName());
 
                 EList<Parameter> parameters = o.getParameter();
                 List<Variable> inputParamList = new ArrayList<Variable>();
@@ -84,28 +85,28 @@ public class ServiceFactory {
                     Variable variable = new Variable(p.getName(), convertTypeCSToType(p.getType()), Variable.ScopeType.PARAM);
                     inputParamList.add(variable);
                 }
-                operation.setInputParamList(inputParamList);
+                operationInfo.setInputParamList(inputParamList);
 
                 Contract contract = null;
                 for (Contract c : contractList) {
                     if (c.getOp().getName().equals(o.getName())) {
                         contract = c;
                         if (c.getOp().getReturnType() != null) {
-                            operation.setReturnType(convertTypeCSToType(c.getOp().getReturnType()));
+                            operationInfo.setReturnType(convertTypeCSToType(c.getOp().getReturnType()));
                         }
                         break;
                     }
                 }
 
-                OperationBodyFactory operationBodyFactory = new OperationBodyFactory(contract, operation, serviceInfo, entityMap);
+                OperationBodyFactory operationBodyFactory = new OperationBodyFactory(contract, operationInfo, serviceInfo, entityMap);
                 operationBodyFactory.factory();
                 OperationBody operationBody = operationBodyFactory.getOperationBody();
-                operation.setOperationBody(operationBody);
+                operationInfo.setOperationBody(operationBody);
 
-                operations.add(operation);
-                operationMap.put(operation.getName(), operation);
+                operationInfos.add(operationInfo);
+                operationMap.put(operationInfo.getName(), operationInfo);
             }
-            serviceInfo.setOperationList(operations);
+            serviceInfo.setOperationList(operationInfos);
 
             boolean logicFound = false;
             for (Interaction i : interactionList) {
@@ -113,16 +114,16 @@ public class ServiceFactory {
                 for (Message m : messages) {
                     if (m instanceof CallMessageImpl) {
                         Operation op = ((CallMessageImpl) m).getOp();
-                        com.rm2pt.generator.cloudedgecollaboration.info.Operation operation = operationMap.get(op.getName());
-                        if (operation != null) {
+                        OperationInfo operationInfo = operationMap.get(op.getName());
+                        if (operationInfo != null) {
                             MixEnd sender = m.getSendingEnd();
                             MixEnd receiver = m.getReceivingEnd();
                             if (sender.getContext() instanceof ActorImpl && receiver.getContext() instanceof ServiceImpl) {
                                 Logic logic = new Logic();
                                 logic.setCaller(Logic.Caller.USER);
-                                logic.setName(operation.getName());
-                                logic.setInputParamList(operation.getInputParamList());
-                                logic.setReturnType(operation.getReturnType());
+                                logic.setName(operationInfo.getName());
+                                logic.setInputParamList(operationInfo.getInputParamList());
+                                logic.setReturnType(operationInfo.getReturnType());
 
                                 // TODO: LogicBody
 
@@ -139,9 +140,9 @@ public class ServiceFactory {
                             } else if (sender.getContext() instanceof ServiceImpl && receiver.getContext() instanceof ActorImpl) {
                                 Logic logic = new Logic();
                                 logic.setCaller(Logic.Caller.NODE);
-                                logic.setName(operation.getName());
-                                logic.setInputParamList(operation.getInputParamList());
-                                logic.setReturnType(operation.getReturnType());
+                                logic.setName(operationInfo.getName());
+                                logic.setInputParamList(operationInfo.getInputParamList());
+                                logic.setReturnType(operationInfo.getReturnType());
 
                                 // TODO: LogicBody
 
@@ -235,5 +236,10 @@ public class ServiceFactory {
             }
         }
         return list;
+    }
+
+    // todo new
+    public List<OperationInfo> getOperation(OperationInfo.ConcurrencyType concurrencyType) {
+        throw new UnsupportedOperationException();
     }
 }

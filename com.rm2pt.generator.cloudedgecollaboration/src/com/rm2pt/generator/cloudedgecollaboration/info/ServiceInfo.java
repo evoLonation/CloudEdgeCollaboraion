@@ -7,8 +7,10 @@ import java.util.List;
 
 public class ServiceInfo {
     private String name;
+    // todo delete
     private List<Variable> globalVariableList;
-    private List<Operation> operationList;
+    private List<OperationInfo> operationInfoList;
+    // todo delete
     // Nullable
     private Logic logic;
     // todo delete
@@ -38,12 +40,12 @@ public class ServiceInfo {
         this.globalVariableList = globalVariableList;
     }
 
-    public List<Operation> getOperationList() {
-        return operationList;
+    public List<OperationInfo> getOperationList() {
+        return operationInfoList;
     }
 
-    public void setOperationList(List<Operation> operationList) {
-        this.operationList = operationList;
+    public void setOperationList(List<OperationInfo> operationInfoList) {
+        this.operationInfoList = operationInfoList;
     }
 
     public Logic getLogic() {

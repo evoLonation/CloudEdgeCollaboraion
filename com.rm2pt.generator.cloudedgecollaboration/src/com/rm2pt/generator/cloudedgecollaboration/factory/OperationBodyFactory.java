@@ -2,7 +2,7 @@ package com.rm2pt.generator.cloudedgecollaboration.factory;
 
 import com.rm2pt.generator.cloudedgecollaboration.factory.zzy.*;
 import com.rm2pt.generator.cloudedgecollaboration.info.Location;
-import com.rm2pt.generator.cloudedgecollaboration.info.Operation;
+import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
@@ -23,8 +23,8 @@ import java.util.Stack;
 public class OperationBodyFactory extends FactoryContext {
     private Contract contract;
     private Location location;
-    public OperationBodyFactory(Contract contract, Operation operation, ServiceInfo serviceInfo, Map<String, EntityInfo> entityInfoMap) {
-        super(new InitPack(new VariableTable(serviceInfo, operation), entityInfoMap, new Stack<>()));
+    public OperationBodyFactory(Contract contract, OperationInfo operationInfo, ServiceInfo serviceInfo, Map<String, EntityInfo> entityInfoMap) {
+        super(new InitPack(new VariableTable(serviceInfo, operationInfo), entityInfoMap, new Stack<>()));
         this.contract = contract;
         this.location = serviceInfo.getLocation();
         var initPack = getInitPack();
