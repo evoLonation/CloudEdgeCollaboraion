@@ -51,6 +51,7 @@ public class OperationInfo {
         WEAKCONSISTENCY,
         DEFAULT,
     }
+    // checkItem:WeakConsistency, enterItems:HighPriority
     private ConcurrencyType concurrencyType;
 
     public ConcurrencyType getConcurrencyType() {
