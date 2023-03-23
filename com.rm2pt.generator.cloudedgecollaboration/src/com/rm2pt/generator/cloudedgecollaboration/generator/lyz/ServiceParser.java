@@ -121,7 +121,7 @@ public class ServiceParser {
             }
         } else if (type instanceof EntityTypeInfo) {
             EntityInfo entityInfo = ((EntityTypeInfo) type).getEntityInfo();
-            return "entity." + entityInfo.getName();
+            return "entity." + entityInfo.getName().substring(0, 1).toUpperCase() + entityInfo.getName().substring(1);
         } else {
             throw new RuntimeException("Unknown entityType: " + type);
         }
