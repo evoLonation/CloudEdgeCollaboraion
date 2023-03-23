@@ -184,4 +184,8 @@ public class EntityInfo implements Cloneable{
     public Association getAssociation(String name) {
         return associationMap.get(name);
     }
+
+    public boolean isOwner(Attribute attribute){
+        return associationMap.get(attribute.getName()) != null;
+    }
 }

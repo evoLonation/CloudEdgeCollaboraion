@@ -27,6 +27,12 @@ public class Variable {
         this.name = name;
         this.type = type;
         this.scopeType = scopeType;
+        check();
+    }
+    private void check(){
+        if(scopeType == ScopeType.LET && getType().isMulti()){
+            throw new UnsupportedOperationException();
+        }
     }
 
     public ScopeType getScopeType() {
@@ -46,5 +52,8 @@ public class Variable {
     }
     public BasicType mustGetBasicType(){
         return ((BasicType)type);
+    }
+    public boolean changeable(){
+        return scopeType == ScopeType.LET || scopeType == ScopeType.DEFINITION || scopeType == ScopeType.GLOBAL;
     }
 }

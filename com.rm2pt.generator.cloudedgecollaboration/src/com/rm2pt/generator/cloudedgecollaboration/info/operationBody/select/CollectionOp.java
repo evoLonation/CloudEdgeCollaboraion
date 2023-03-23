@@ -25,4 +25,12 @@ public abstract class CollectionOp extends Statement {
     protected boolean isReturnMulti(){
         return true;
     }
+
+    public Variable getTargetVar() {
+        return targetVar;
+    }
+
+    public Source getSource() {
+        return source;
+    }
 }
