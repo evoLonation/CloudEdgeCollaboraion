@@ -1,5 +1,6 @@
 package com.rm2pt.generator.cloudedgecollaboration.generator;
 
+import com.rm2pt.generator.cloudedgecollaboration.generator.zzy.RedisTemplate;
 import com.rm2pt.generator.cloudedgecollaboration.info.GlobalInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
 
@@ -15,7 +16,8 @@ public class RedisGenerator extends Generator{
     }
 
     @Override
-    protected void generate() {
-
+    public void generate() {
+        generateFile("build/redis/cluster.yaml", RedisTemplate.generateCluster(redisNumber));
+        generateFile("build/redis/highpriority.yaml", RedisTemplate.generateHighpriority(operationNameList));
     }
 }

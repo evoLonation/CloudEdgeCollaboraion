@@ -66,7 +66,7 @@ class ServerTemplate {
 		}
 		'''
 	}
-	static def String generateServer(String projectName, List<String> reqList, List<String> resList, List<String> start){
+	static def String generateServer(String projectName, List<String> reqList, List<String> resList, String start){
 		var package = '''«Keyworder.camelToDivider(projectName)»'''
 		'''
 		package listen

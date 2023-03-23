@@ -41,6 +41,10 @@ public class Processor {
         serviceFactory.factory();
 		new ServicePackageGenerator(serviceFactory.getServiceList(),
 				serviceFactory.getOperation(OperationInfo.ConcurrencyType.HIGHPRIORITY)).generate();
+		new ConfigGenerator(serviceFactory.getOperation(OperationInfo.ConcurrencyType.HIGHPRIORITY), globalInfo).generate();
+		new ServerPackageGenerator(serviceFactory.getServiceList(), globalInfo).generate();
+		new RedisGenerator(serviceFactory.getOperation(OperationInfo.ConcurrencyType.HIGHPRIORITY), globalInfo).generate();
+
 
 		// todo configpackage, redisdeploy, commonpackage, serverpackage, highprioritypackage, etcpackage 's generate
 
