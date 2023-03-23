@@ -30,10 +30,35 @@ public class ServiceFactory {
     private final Map<String, ServiceInfo> serviceInfoMap;
 
     public ServiceFactory(List<Interaction> interactionList, List<Service> serviceList, List<Contract> contractList, Map<String, EntityInfo> entityMap) {
+        System.out.println("\nServiceFactory:");
+
         this.interactionList = interactionList;
+        System.out.println("interactionList size: " + interactionList.size());
+        for (Interaction interaction : interactionList) {
+            System.out.println("interaction: " + interaction.getName());
+        }
+
         this.serviceList = serviceList;
+        System.out.println("serviceList size: " + serviceList.size());
+        for (Service service : serviceList) {
+            System.out.println("service: " + service.getName());
+        }
+
         this.contractList = contractList;
+        System.out.println("contractList size: " + contractList.size());
+        for (Contract contract : contractList) {
+            System.out.println("contract: " + contract.getOp().getName());
+        }
+
         this.entityMap = entityMap;
+        System.out.println("entityMap size: " + entityMap.size());
+        for (Map.Entry<String, EntityInfo> entry : entityMap.entrySet()) {
+            String mapKey = entry.getKey();
+            EntityInfo mapValue = entry.getValue();
+            System.out.println(mapKey + "：" + mapValue);
+        }
+        System.out.println("lalala" + entityMap.get("item"));
+
         serviceInfoList = new ArrayList<ServiceInfo>();
         serviceInfoMap = new HashMap<String, ServiceInfo>();
     }
@@ -51,39 +76,43 @@ public class ServiceFactory {
 
         for (Service service : serviceList) {
             ServiceInfo serviceInfo = new ServiceInfo();
+            serviceInfo.setName(service.getName());
+            System.out.println("\nservice name: " + service.getName());
 
             EList<Operation> operationEList = service.getOperation();
-            List<OperationInfo> operationInfos
-                    = new ArrayList<>();
-            Map<String, OperationInfo> operationMap
-                    = new HashMap<>();
+            List<OperationInfo> operationInfos = new ArrayList<>();
+            Map<String, OperationInfo> operationMap = new HashMap<>();
             for (Operation o : operationEList) {
                 OperationInfo operationInfo = new OperationInfo();
                 operationInfo.setName(o.getName());
+                System.out.println("operation name: " + o.getName());
 
-                EList<Parameter> parameters = o.getParameter();
-                List<Variable> inputParamList = new ArrayList<Variable>();
-                for (Parameter p : parameters) {
-                    Variable variable = new Variable(p.getName(), convertTypeCSToType(p.getType()), Variable.ScopeType.PARAM);
-                    inputParamList.add(variable);
-                }
-                operationInfo.setInputParamList(inputParamList);
-
-                Contract contract = null;
                 for (Contract c : contractList) {
                     if (c.getOp().getName().equals(o.getName())) {
-                        contract = c;
+                        System.out.println("\tGet parameters:");
+                        EList<Parameter> parameters = c.getOp().getParameter();
+                        List<Variable> inputParamList = new ArrayList<Variable>();
+                        for (Parameter p : parameters) {
+                            Variable variable = new Variable(p.getName(), convertTypeCSToType(p.getType()), Variable.ScopeType.PARAM);
+                            inputParamList.add(variable);
+                            System.out.println("\t\tparameter name: " + p.getName());
+                        }
+                        operationInfo.setInputParamList(inputParamList);
+
+                        System.out.println("\tGet return type:");
                         if (c.getOp().getReturnType() != null) {
                             operationInfo.setReturnType(convertTypeCSToType(c.getOp().getReturnType()));
+                            System.out.println("\t\treturn type: " + c.getOp().getReturnType());
                         }
                         break;
                     }
                 }
 
-                OperationBodyFactory operationBodyFactory = new OperationBodyFactory(contract, operationInfo, serviceInfo, entityMap);
-                operationBodyFactory.factory();
-                OperationBody operationBody = operationBodyFactory.getOperationBody();
-                operationInfo.setOperationBody(operationBody);
+                // todo operationbody
+//                OperationBodyFactory operationBodyFactory = new OperationBodyFactory(contract, operationInfo, serviceInfo, entityMap);
+//                operationBodyFactory.factory();
+//                OperationBody operationBody = operationBodyFactory.getOperationBody();
+                operationInfo.setOperationBody(null);
 
                 if (operationInfo.getName().equals("enterItems")) {
                     operationInfo.setConcurrencyType(OperationInfo.ConcurrencyType.HIGHPRIORITY);
@@ -127,9 +156,10 @@ public class ServiceFactory {
             }
             return type;
         } else if (typeCS instanceof EntityTypeImpl) {
-            EntityInfo entityInfo = entityMap.get(((EntityTypeImpl) typeCS).getEntity().getName());
+            System.out.println("entity name: " + ((EntityTypeImpl) typeCS).getEntity().getName().toLowerCase());
+            EntityInfo entityInfo = entityMap.get(((EntityTypeImpl) typeCS).getEntity().getName().toLowerCase());
             if (entityInfo == null) {
-                throw new RuntimeException("Entity not found: " + ((EntityTypeImpl) typeCS).getEntity().getName());
+                throw new RuntimeException("Entity not found: " + ((EntityTypeImpl) typeCS).getEntity().getName().toLowerCase());
             }
             return new EntityTypeInfo(entityInfo);
         } else {

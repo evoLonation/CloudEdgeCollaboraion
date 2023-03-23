@@ -65,7 +65,7 @@ public class ServiceParser {
     public static String parseContextServiceParameter(List<ServiceInfo> serviceInfoList) {
         StringBuilder sb = new StringBuilder();
         for (ServiceInfo serviceInfo : serviceInfoList) {
-            sb.append(parseServiceName(serviceInfo, false)).append(" ").append(parseServiceName(serviceInfo, true)).append(", ");
+            sb.append(parseServiceName(serviceInfo, false)).append(" *").append(parseServiceName(serviceInfo, true)).append(", ");
         }
         if (sb.length() > 0) {
             sb.delete(sb.length() - 2, sb.length());
