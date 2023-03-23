@@ -24,7 +24,7 @@ public class EntityPackageGenerator extends Generator {
     @Override
     public void generate() {
         for (EntityInfo entityInfo : infoList) {
-            String entityName = entityInfo.getName();
+            String entityName = Keyworder.firstUpperCase(entityInfo.getName());
 
             String idName = entityInfo.getIdAttribute().getName();
             String idType = entityInfo.getIdAttribute().getType().getTypeEnum().name();
@@ -71,15 +71,15 @@ public class EntityPackageGenerator extends Generator {
     private String basicType2GOType(String type) {
         switch (type) {
             case "INTEGER":
-                return "Int64";
+                return "int64";
             case "TIME":
                 return "time.Time";
             case "REAL":
-                return "Float64";
+                return "float64";
             case "STRING":
-                return "String";
+                return "string";
             case "BOOLEAN":
-                return "Bool";
+                return "bool";
             default:
                 throw new RuntimeException("Unknown entityType: " + type);
 
