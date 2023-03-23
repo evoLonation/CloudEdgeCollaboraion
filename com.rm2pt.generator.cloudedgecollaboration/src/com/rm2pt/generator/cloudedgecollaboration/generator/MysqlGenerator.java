@@ -32,6 +32,7 @@ public class MysqlGenerator extends Generator{
     }
     // todo implement
     public void generate(){
+        entityInfoName2UnderScore(entityInfoList);
         classifyEntity();
         generateReplication();
         generateSharding();
@@ -86,6 +87,12 @@ public class MysqlGenerator extends Generator{
         String replicationText = ReplicationTemplate.Context(makeDDL, DDLText, globalInfo.getDatabaseReplicationNum());
         generateFile("build/mysql/replication.yaml", replicationText);
         System.out.println("Generated replication.yaml");
+    }
+
+    private void entityInfoName2UnderScore(List<EntityInfo> infoList){
+        for (EntityInfo entityInfo : infoList){
+            entityInfo.setName(Keyworder.camelToUnderScore(entityInfo.getName()));
+        }
     }
 
     private void classifyEntity(){

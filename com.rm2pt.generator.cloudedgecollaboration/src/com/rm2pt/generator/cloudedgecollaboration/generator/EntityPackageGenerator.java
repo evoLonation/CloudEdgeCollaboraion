@@ -71,15 +71,15 @@ public class EntityPackageGenerator extends Generator {
     private String basicType2GOType(String type) {
         switch (type) {
             case "INTEGER":
-                return "int64";
+                return "Int64";
             case "TIME":
                 return "time.Time";
             case "REAL":
-                return "float64";
+                return "Float64";
             case "STRING":
-                return "string";
+                return "String";
             case "BOOLEAN":
-                return "bool";
+                return "Bool";
             default:
                 throw new RuntimeException("Unknown entityType: " + type);
 
