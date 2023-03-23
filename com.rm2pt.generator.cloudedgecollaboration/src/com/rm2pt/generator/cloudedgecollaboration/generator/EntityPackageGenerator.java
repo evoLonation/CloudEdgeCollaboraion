@@ -64,22 +64,22 @@ public class EntityPackageGenerator extends Generator {
             GOEntityList.add(entityStr);
         }
         GOText = EntityTemplate.GOContext(GOEntityList);
-        generateFile("entity.go", GOText);
+        generateFile("entity/entity.go", GOText);
         System.out.println("Generated_GO");
     }
 
     private String basicType2GOType(String type) {
         switch (type) {
             case "INTEGER":
-                return "int32";
+                return "Int64";
             case "TIME":
                 return "time.Time";
             case "REAL":
-                return "float64";
+                return "Float64";
             case "STRING":
-                return "string";
+                return "String";
             case "BOOLEAN":
-                return "bool";
+                return "Bool";
             default:
                 throw new RuntimeException("Unknown entityType: " + type);
 
