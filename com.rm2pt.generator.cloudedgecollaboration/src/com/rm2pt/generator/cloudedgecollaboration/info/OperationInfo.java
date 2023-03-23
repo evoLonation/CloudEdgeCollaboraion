@@ -57,5 +57,9 @@ public class OperationInfo {
     public ConcurrencyType getConcurrencyType() {
         return concurrencyType;
     }
+
+    public void setConcurrencyType(ConcurrencyType concurrencyType) {
+        this.concurrencyType = concurrencyType;
+    }
 }
 

@@ -1,13 +1,13 @@
 package com.rm2pt.generator.cloudedgecollaboration.generator;
 
-import com.rm2pt.generator.cloudedgecollaboration.info.Location;
-import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
-import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
-import com.rm2pt.generator.cloudedgecollaboration.generator.lyz.*;
-import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.rm2pt.generator.cloudedgecollaboration.generator.lyz.ContextTemplate;
+import com.rm2pt.generator.cloudedgecollaboration.generator.lyz.HighPriorityTemplate;
+import com.rm2pt.generator.cloudedgecollaboration.generator.lyz.ServiceTemplate;
+import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
+import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
 
 // todo
 public class ServicePackageGenerator extends Generator {
@@ -19,34 +19,29 @@ public class ServicePackageGenerator extends Generator {
 
     @Override
     public void generate() {
+        String golangCode = "";
+        List<OperationInfo> highPriOperationList = new ArrayList<>();
         for (ServiceInfo service : serviceList) {
-            String golangCode = "";
-
-            List<Variable> globalVariableList = service.getGlobalVariableList();
             List<OperationInfo> operationInfoList = service.getOperationList();
-            List<GolangOperation> golangOperationList = new ArrayList<>();
-            for (int i = 0; i < operationInfoList.size(); i++) {
-                if (i != operationInfoList.size() - 1) {
-                    GolangOperation golangOperation = new GolangOperation(operationInfoList.get(i), GolangOperation.OperationScope.PRIVATE);
-                    golangOperationList.add(golangOperation);
-                } else {
-                    GolangOperation golangOperation = new GolangOperation(operationInfoList.get(i), GolangOperation.OperationScope.PUBLIC);
-                    golangOperationList.add(golangOperation);
+            for (OperationInfo operationInfo : operationInfoList) {
+                if (operationInfo.getConcurrencyType() == OperationInfo.ConcurrencyType.HIGHPRIORITY) {
+                    highPriOperationList.add(operationInfo);
                 }
             }
+        }
 
-            String serviceFileName = service.getName() + ".go";
-            if (service.getLocation() == Location.CLOUD) {
-                serviceFileName = "cloud/service/" + serviceFileName;
+        golangCode = ContextTemplate.generateContext(serviceList, highPriOperationList);
+        generateFile("service/context.go", golangCode);
+        System.out.println("service/context.go generated");
 
-                golangCode = CloudServiceTemplate.generateService(service, globalVariableList, golangOperationList);
-            } else if (service.getLocation() == Location.EDGE) {
-                serviceFileName = "edge/service/" + serviceFileName;
-                golangCode = EdgeServiceTemplate.generateService(service, globalVariableList, golangOperationList);
-            } else {
-                throw new RuntimeException("Service location error");
-            }
+        golangCode = HighPriorityTemplate.generateHighPriority(highPriOperationList);
+        generateFile("service/highpriority.go", golangCode);
+        System.out.println("service/highpriority.go generated");
 
+        for (ServiceInfo service : serviceList) {
+
+            String serviceFileName = "service/" + service.getName() + ".go";
+            golangCode = ServiceTemplate.generateService(service);
             generateFile(serviceFileName, golangCode);
             System.out.println(serviceFileName + " generated");
         }
