@@ -57,6 +57,9 @@ public class OperationBodyFactory extends FactoryContext {
 
     private void buildDefinition() {
         Definition definition = contract.getDef();
+        if (definition == null || definition.getVariable() == null) {
+        	return;
+        }
         definition.getVariable().forEach(this::dealDefVariable);
     }
 
