@@ -19,6 +19,8 @@ public class ServicePackageGenerator extends Generator {
 
     @Override
     public void generate() {
+        System.out.println("Generating service package: ");
+
         String golangCode = "";
         List<OperationInfo> highPriOperationList = new ArrayList<>();
         for (ServiceInfo service : serviceList) {
@@ -39,8 +41,10 @@ public class ServicePackageGenerator extends Generator {
         System.out.println("service/highpriority.go generated");
 
         for (ServiceInfo service : serviceList) {
-
-            String serviceFileName = "service/" + service.getName() + ".go";
+            System.out.println("\tGenerating service: " + service.getName());
+            String serviceFileName = "service/" +
+                    service.getName().substring(0, 1).toLowerCase() + service.getName().substring(1) +
+                    ".go";
             golangCode = ServiceTemplate.generateService(service);
             generateFile(serviceFileName, golangCode);
             System.out.println(serviceFileName + " generated");
