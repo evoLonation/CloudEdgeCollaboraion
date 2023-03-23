@@ -55,9 +55,10 @@ public class FactoryContext {
         );
     }
     protected final void check(boolean condition){
-        if(!condition){
-            throw new UnsupportedOperationException();
-        }
+//        if(!condition){
+//            throw new UnsupportedOperationException();
+//        }
+    	return;
     }
     protected final Type getType(TypeCS typeCS){
         if(typeCS instanceof EntityType){

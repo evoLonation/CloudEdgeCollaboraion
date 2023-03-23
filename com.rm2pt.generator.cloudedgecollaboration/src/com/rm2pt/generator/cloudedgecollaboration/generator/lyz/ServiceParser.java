@@ -1,5 +1,7 @@
 package com.rm2pt.generator.cloudedgecollaboration.generator.lyz;
 
+import com.rm2pt.generator.cloudedgecollaboration.factory.OperationBodyFactory;
+import com.rm2pt.generator.cloudedgecollaboration.generator.OperationBodyGenerator;
 import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.*;
@@ -8,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceParser {
-    public static String parseOperationParameter(GolangOperation operation) {
+    public static String parseOperationParameter(OperationInfo operation) {
         String parameterStr;
         List<Variable> inputParamList = operation.getInputParamList();
         StringBuilder sb = new StringBuilder();
@@ -47,6 +49,58 @@ public class ServiceParser {
             }
         }
         return goOps;
+    }
+
+    public static String parseOperationReturn(OperationInfo operation) {
+        String returnStr;
+        Type returnType = operation.getReturnType();
+        if (returnType == null) {
+            returnStr = "";
+        } else {
+            returnStr = "result " + parseType(returnType);
+        }
+        return returnStr;
+    }
+
+    public static String parseContextServiceParameter(List<ServiceInfo> serviceInfoList) {
+        StringBuilder sb = new StringBuilder();
+        for (ServiceInfo serviceInfo : serviceInfoList) {
+            sb.append(parseServiceName(serviceInfo, false)).append(" *").append(parseServiceName(serviceInfo, true)).append(", ");
+        }
+        if (sb.length() > 0) {
+            sb.delete(sb.length() - 2, sb.length());
+        }
+        return sb.toString();
+    }
+
+    public static String parseServiceName(ServiceInfo service, boolean isEntity) {
+        String serviceName = service.getName();
+        if (isEntity) {
+            serviceName = serviceName.substring(0, 1).toUpperCase() + serviceName.substring(1);
+        } else {
+            serviceName = serviceName.substring(0, 1).toLowerCase() + serviceName.substring(1);
+        }
+        return serviceName;
+    }
+
+    public static String parseOperationName(OperationInfo operation, boolean isEntity) {
+        String operationName = operation.getName();
+        if (isEntity) {
+            operationName = operationName.substring(0, 1).toUpperCase() + operationName.substring(1);
+        } else {
+            operationName = operationName.substring(0, 1).toLowerCase() + operationName.substring(1);
+        }
+        return operationName;
+    }
+
+    public static String getHPOBodyString(OperationInfo operation) {
+        OperationBodyGenerator operationBodyGenerator = new OperationBodyGenerator(operation.getOperationBody());
+        return operationBodyGenerator.generateHighPriority();
+    }
+
+    public static String getOperationBodyString(OperationInfo operation) {
+        OperationBodyGenerator operationBodyGenerator = new OperationBodyGenerator(operation.getOperationBody());
+        return operationBodyGenerator.generate();
     }
 
     public static String parseType(Type type) {

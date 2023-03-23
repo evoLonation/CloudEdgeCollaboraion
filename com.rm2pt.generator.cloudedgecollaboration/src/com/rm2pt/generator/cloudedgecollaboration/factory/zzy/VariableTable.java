@@ -30,6 +30,9 @@ public class VariableTable {
         addParamVariable(operationInfo);
     }
     private void addGlobalVariable(ServiceInfo serviceInfo){
+        if (serviceInfo.getGlobalVariableList() == null) {
+            return;
+        }
         serviceInfo.getGlobalVariableList()
                 .forEach(this::addVariable);
     }

@@ -1,13 +1,12 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory;
 
-import com.rm2pt.generator.cloudedgecollaboration.info.Location;
-import com.rm2pt.generator.cloudedgecollaboration.info.Logic;
 import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.*;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBody;
 import net.mydreamy.requirementmodel.rEMODEL.*;
-import net.mydreamy.requirementmodel.rEMODEL.impl.*;
+import net.mydreamy.requirementmodel.rEMODEL.impl.EntityTypeImpl;
+import net.mydreamy.requirementmodel.rEMODEL.impl.PrimitiveTypeCSImpl;
 import org.eclipse.emf.common.util.EList;
 
 import java.util.ArrayList;
@@ -31,10 +30,35 @@ public class ServiceFactory {
     private final Map<String, ServiceInfo> serviceInfoMap;
 
     public ServiceFactory(List<Interaction> interactionList, List<Service> serviceList, List<Contract> contractList, Map<String, EntityInfo> entityMap) {
+        System.out.println("\nServiceFactory:");
+
         this.interactionList = interactionList;
+        System.out.println("interactionList size: " + interactionList.size());
+        for (Interaction interaction : interactionList) {
+            System.out.println("interaction: " + interaction.getName());
+        }
+
         this.serviceList = serviceList;
+        System.out.println("serviceList size: " + serviceList.size());
+        for (Service service : serviceList) {
+            System.out.println("service: " + service.getName());
+        }
+
         this.contractList = contractList;
+        System.out.println("contractList size: " + contractList.size());
+        for (Contract contract : contractList) {
+            System.out.println("contract: " + contract.getOp().getName());
+        }
+
         this.entityMap = entityMap;
+        System.out.println("entityMap size: " + entityMap.size());
+        for (Map.Entry<String, EntityInfo> entry : entityMap.entrySet()) {
+            String mapKey = entry.getKey();
+            EntityInfo mapValue = entry.getValue();
+            System.out.println(mapKey + "：" + mapValue);
+        }
+        System.out.println("lalala" + entityMap.get("item"));
+
         serviceInfoList = new ArrayList<ServiceInfo>();
         serviceInfoMap = new HashMap<String, ServiceInfo>();
     }
@@ -52,127 +76,56 @@ public class ServiceFactory {
 
         for (Service service : serviceList) {
             ServiceInfo serviceInfo = new ServiceInfo();
-            if (service.getName().startsWith("Cloud")) {
-                serviceInfo.setName(service.getName().replace("Cloud", ""));
-                serviceInfo.setLocation(Location.CLOUD);
-            } else if (service.getName().startsWith("Edge")) {
-                serviceInfo.setName(service.getName().replace("Edge", ""));
-                serviceInfo.setLocation(Location.EDGE);
-            } else {
-                throw new RuntimeException("Invalid Service Name: " + service.getName());
-            }
-
-            EList<Attribute> tempProperties = service.getTemp_property();
-            List<Variable> variables = new ArrayList<Variable>();
-            for (Attribute attribute : tempProperties) {
-                Variable variable = new Variable(attribute.getName(), convertTypeCSToType(attribute.getType()), Variable.ScopeType.GLOBAL);
-                variables.add(variable);
-            }
-            serviceInfo.setGlobalVariableList(variables);
+            serviceInfo.setName(service.getName());
+            System.out.println("\nservice name: " + service.getName());
 
             EList<Operation> operationEList = service.getOperation();
-            List<OperationInfo> operationInfos
-                    = new ArrayList<>();
-            Map<String, OperationInfo> operationMap
-                    = new HashMap<>();
+            List<OperationInfo> operationInfos = new ArrayList<>();
+            Map<String, OperationInfo> operationMap = new HashMap<>();
             for (Operation o : operationEList) {
                 OperationInfo operationInfo = new OperationInfo();
                 operationInfo.setName(o.getName());
+                System.out.println("operation name: " + o.getName());
 
-                EList<Parameter> parameters = o.getParameter();
-                List<Variable> inputParamList = new ArrayList<Variable>();
-                for (Parameter p : parameters) {
-                    Variable variable = new Variable(p.getName(), convertTypeCSToType(p.getType()), Variable.ScopeType.PARAM);
-                    inputParamList.add(variable);
-                }
-                operationInfo.setInputParamList(inputParamList);
-
-                Contract contract = null;
                 for (Contract c : contractList) {
                     if (c.getOp().getName().equals(o.getName())) {
-                        contract = c;
+                        System.out.println("\tGet parameters:");
+                        EList<Parameter> parameters = c.getOp().getParameter();
+                        List<Variable> inputParamList = new ArrayList<Variable>();
+                        for (Parameter p : parameters) {
+                            Variable variable = new Variable(p.getName(), convertTypeCSToType(p.getType()), Variable.ScopeType.PARAM);
+                            inputParamList.add(variable);
+                            System.out.println("\t\tparameter name: " + p.getName());
+                        }
+                        operationInfo.setInputParamList(inputParamList);
+
+                        System.out.println("\tGet return type:");
                         if (c.getOp().getReturnType() != null) {
                             operationInfo.setReturnType(convertTypeCSToType(c.getOp().getReturnType()));
+                            System.out.println("\t\treturn type: " + c.getOp().getReturnType());
                         }
                         break;
                     }
                 }
 
-                OperationBodyFactory operationBodyFactory = new OperationBodyFactory(contract, operationInfo, serviceInfo, entityMap);
-                operationBodyFactory.factory();
-                OperationBody operationBody = operationBodyFactory.getOperationBody();
-                operationInfo.setOperationBody(operationBody);
+                // todo operationbody
+//                OperationBodyFactory operationBodyFactory = new OperationBodyFactory(contract, operationInfo, serviceInfo, entityMap);
+//                operationBodyFactory.factory();
+//                OperationBody operationBody = operationBodyFactory.getOperationBody();
+                operationInfo.setOperationBody(null);
+
+                if (operationInfo.getName().equals("enterItems")) {
+                    operationInfo.setConcurrencyType(OperationInfo.ConcurrencyType.HIGHPRIORITY);
+                } else if (operationInfo.getName().equals("checkItem")) {
+                    operationInfo.setConcurrencyType(OperationInfo.ConcurrencyType.WEAKCONSISTENCY);
+                } else {
+                    operationInfo.setConcurrencyType(OperationInfo.ConcurrencyType.DEFAULT);
+                }
 
                 operationInfos.add(operationInfo);
                 operationMap.put(operationInfo.getName(), operationInfo);
             }
             serviceInfo.setOperationList(operationInfos);
-
-            boolean logicFound = false;
-            for (Interaction i : interactionList) {
-                EList<Message> messages = i.getMessages();
-                for (Message m : messages) {
-                    if (m instanceof CallMessageImpl) {
-                        Operation op = ((CallMessageImpl) m).getOp();
-                        OperationInfo operationInfo = operationMap.get(op.getName());
-                        if (operationInfo != null) {
-                            MixEnd sender = m.getSendingEnd();
-                            MixEnd receiver = m.getReceivingEnd();
-                            if (sender.getContext() instanceof ActorImpl && receiver.getContext() instanceof ServiceImpl) {
-                                Logic logic = new Logic();
-                                logic.setCaller(Logic.Caller.USER);
-                                logic.setName(operationInfo.getName());
-                                logic.setInputParamList(operationInfo.getInputParamList());
-                                logic.setReturnType(operationInfo.getReturnType());
-
-                                // TODO: LogicBody
-
-                                logic.setServiceToCall(serviceInfo);
-                                serviceInfo.setLogic(logic);
-
-                                if (logic.getReturnType() != null) {
-                                    serviceInfo.setInteractiveType(ServiceInfo.InteractiveType.LOGICTOUSER);
-                                } else {
-                                    serviceInfo.setInteractiveType(ServiceInfo.InteractiveType.LOGICNORETURN);
-                                }
-
-                                logicFound = true;
-                            } else if (sender.getContext() instanceof ServiceImpl && receiver.getContext() instanceof ActorImpl) {
-                                Logic logic = new Logic();
-                                logic.setCaller(Logic.Caller.NODE);
-                                logic.setName(operationInfo.getName());
-                                logic.setInputParamList(operationInfo.getInputParamList());
-                                logic.setReturnType(operationInfo.getReturnType());
-
-                                // TODO: LogicBody
-
-                                logic.setServiceToCall(serviceInfo);
-                                serviceInfo.setLogic(logic);
-
-                                if (logic.getReturnType() != null) {
-                                    serviceInfo.setInteractiveType(ServiceInfo.InteractiveType.LOGICTONODE);
-                                } else {
-                                    serviceInfo.setInteractiveType(ServiceInfo.InteractiveType.LOGICNORETURN);
-                                }
-
-                                logicFound = true;
-                            }
-                        }
-                    }
-
-                    if (logicFound) {
-                        break;
-                    }
-                }
-
-                if (logicFound) {
-                    break;
-                }
-            }
-
-            if (serviceInfo.getLogic() == null) {
-                serviceInfo.setInteractiveType(ServiceInfo.InteractiveType.NORMAL);
-            }
 
             serviceInfoList.add(serviceInfo);
             serviceInfoMap.put(service.getName(), serviceInfo);
@@ -203,9 +156,10 @@ public class ServiceFactory {
             }
             return type;
         } else if (typeCS instanceof EntityTypeImpl) {
-            EntityInfo entityInfo = entityMap.get(((EntityTypeImpl) typeCS).getEntity().getName());
+            System.out.println("entity name: " + ((EntityTypeImpl) typeCS).getEntity().getName().toLowerCase());
+            EntityInfo entityInfo = entityMap.get(((EntityTypeImpl) typeCS).getEntity().getName().toLowerCase());
             if (entityInfo == null) {
-                throw new RuntimeException("Entity not found: " + ((EntityTypeImpl) typeCS).getEntity().getName());
+                throw new RuntimeException("Entity not found: " + ((EntityTypeImpl) typeCS).getEntity().getName().toLowerCase());
             }
             return new EntityTypeInfo(entityInfo);
         } else {
@@ -224,22 +178,16 @@ public class ServiceFactory {
         return serviceInfoMap;
     }
 
-
-    /**
-     * @return 返回满足参数条件的服务，要求复杂度O(1)
-     */
-    public List<ServiceInfo> getServiceList(Location location, ServiceInfo.InteractiveType interactiveType) {
-        List<ServiceInfo> list = new ArrayList<ServiceInfo>();
+    // todo new
+    public List<OperationInfo> getOperation(OperationInfo.ConcurrencyType concurrencyType) {
+        List<OperationInfo> list = new ArrayList<>();
         for (ServiceInfo serviceInfo : serviceInfoList) {
-            if (serviceInfo.getLocation() == location && serviceInfo.getInteractiveType() == interactiveType) {
-                list.add(serviceInfo);
+            for (OperationInfo operationInfo : serviceInfo.getOperationList()) {
+                if (operationInfo.getConcurrencyType() == concurrencyType) {
+                    list.add(operationInfo);
+                }
             }
         }
         return list;
-    }
-
-    // todo new
-    public List<OperationInfo> getOperation(OperationInfo.ConcurrencyType concurrencyType) {
-        throw new UnsupportedOperationException();
     }
 }

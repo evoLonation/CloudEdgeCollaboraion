@@ -1,5 +1,6 @@
 package com.rm2pt.generator.cloudedgecollaboration.generator;
 
+import com.rm2pt.generator.cloudedgecollaboration.generator.zzy.ServiceTemplate;
 import com.rm2pt.generator.cloudedgecollaboration.info.Location;
 import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBody;
