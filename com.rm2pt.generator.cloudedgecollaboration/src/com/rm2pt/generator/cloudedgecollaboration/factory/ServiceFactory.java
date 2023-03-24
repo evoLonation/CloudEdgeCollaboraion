@@ -104,15 +104,16 @@ public class ServiceFactory {
                             operationInfo.setReturnType(convertTypeCSToType(c.getOp().getReturnType()));
                             System.out.println("\t\treturn type: " + c.getOp().getReturnType());
                         }
+                        // todo operationbody
+                        OperationBodyFactory operationBodyFactory = new OperationBodyFactory(c, operationInfo, serviceInfo, entityMap);
+                        operationBodyFactory.factory();
+                        OperationBody operationBody = operationBodyFactory.getOperationBody();
+                        operationInfo.setOperationBody(operationBody);
                         break;
                     }
                 }
 
-                // todo operationbody
-//                OperationBodyFactory operationBodyFactory = new OperationBodyFactory(contract, operationInfo, serviceInfo, entityMap);
-//                operationBodyFactory.factory();
-//                OperationBody operationBody = operationBodyFactory.getOperationBody();
-                operationInfo.setOperationBody(null);
+
 
                 if (operationInfo.getName().equals("enterItems")) {
                     operationInfo.setConcurrencyType(OperationInfo.ConcurrencyType.HIGHPRIORITY);

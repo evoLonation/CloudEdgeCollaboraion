@@ -2,9 +2,10 @@
 **/bin
 **/xtend-gen
 **/target
-**/.project
 **/.settings
 *.feature
 *.updatesite
 **/*.iml
 **/.classpath
+**/representations.aird
+com.rm2pt.generator.cloudedgecollaboration/lib/*
