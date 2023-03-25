@@ -136,7 +136,7 @@ public class EntityFactory {
                         throw new AssertionError("association is not a foreign key!");
                     }
                     EntityInfo.Attribute attribute = new EntityInfo.Attribute();
-                    attribute.setName(((EntityInfo.ForeignKeyAss) association).getName());
+                    attribute.setName(((EntityInfo.ForeignKeyAss) association).getRefAttrName());
                     attribute.setType(((EntityInfo.ForeignKeyAss) association).getType());
                     entityInfo.addAttribute(attribute);
                 }
