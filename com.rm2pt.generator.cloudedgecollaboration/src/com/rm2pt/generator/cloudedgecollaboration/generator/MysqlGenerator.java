@@ -35,6 +35,7 @@ public class MysqlGenerator extends Generator{
     }
     // todo implement
     public void generate(){
+        entityInfoName2UnderScore(entityInfoList);
         classifyEntity();
         generateReplication();
         generateSharding();

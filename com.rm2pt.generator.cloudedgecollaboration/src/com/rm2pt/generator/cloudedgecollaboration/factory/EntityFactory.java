@@ -58,7 +58,7 @@ public class EntityFactory {
         }
         addRef2Association();
         generateMaps();
-        outputEntityInfoListForDebug();
+//        outputEntityInfoListForDebug();
     }
 
     public void outputEntityInfoListForDebug() { //if there is any problem with EntityInfo, use this to debug
