@@ -23,7 +23,8 @@ public class MysqlGenerator extends Generator{
     private final String makeDDL;
 
     public MysqlGenerator(List<EntityInfo> EntityInfoList, GlobalInfo globalInfo){
-        this.entityInfoList = EntityInfoList;
+        this.entityInfoList = new ArrayList<>();
+        entityInfoList.addAll(EntityInfoList);
         this.globalInfo = globalInfo;
         replicationInfoList = new ArrayList<>();
         shardingInfoList = new ArrayList<>();

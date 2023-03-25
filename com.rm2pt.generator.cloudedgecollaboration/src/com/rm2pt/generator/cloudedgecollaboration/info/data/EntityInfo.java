@@ -74,6 +74,12 @@ public class EntityInfo implements Cloneable{
         this.associationMap = associationMap;
     }
 
+    public Map<String, KeyType> getKeyTypeMap() {
+        return keyTypeMap;
+    }
+
+
+
     public void setKeyTypeMap(Map<String, KeyType> keyTypeMap) {
         this.keyTypeMap = keyTypeMap;
     }

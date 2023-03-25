@@ -91,6 +91,8 @@ public class EntityFactory {
                 System.out.println("--assoRefName: " + ((EntityInfo.ForeignKeyAss) association).getRefAttrName());
                 System.out.println("--assoRefType: " + ((EntityInfo.ForeignKeyAss) association).getType().getTypeEnum().name());
             }
+            System.out.println("KeyTypeMap:");
+            System.out.println(entityInfo.getKeyTypeMap());
         }
     }
 
@@ -117,7 +119,7 @@ public class EntityFactory {
             }
             for (EntityInfo.Association association : entityInfo.getAssociationList()){
                 assoMap.put(association.getName(), association);
-                keyTypeMap.put(association.getTargetEntity().getIdAttribute().getName(), EntityInfo.KeyType.ASSOCIATION);
+                keyTypeMap.put(association.getName(), EntityInfo.KeyType.ASSOCIATION);
             }
             entityInfo.setAssociationMap(assoMap);
             entityInfo.setAttributeMap(attrMap);
