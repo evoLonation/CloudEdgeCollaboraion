@@ -9,6 +9,8 @@ import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class EntityPackageGenerator extends Generator {
     private final List<EntityInfo> infoList;
@@ -35,7 +37,7 @@ public class EntityPackageGenerator extends Generator {
 
             List<AttributeStr> attributes = new ArrayList<>();
             for (EntityInfo.Attribute attr : entityInfo.getAttributeList()) {
-                if (attr.getName().equals(idName)){
+                if (attr.getName().equals(idName) || isInAssociation(entityInfo, attr)){
                     continue;
                 }
                 String attrName = attr.getName();
@@ -66,6 +68,13 @@ public class EntityPackageGenerator extends Generator {
         GOText = EntityTemplate.GOContext(GOEntityList);
         generateFile("entity/entity.go", GOText);
         System.out.println("Generated_GO");
+    }
+
+    private boolean isInAssociation(EntityInfo entityInfo, EntityInfo.Attribute attribute){
+        String attrName = attribute.getName();
+        Map<String, EntityInfo.Association> assoMap = entityInfo.getAssociationMap();
+        EntityInfo.Association association = assoMap.get(attrName);
+        return Objects.nonNull(association);
     }
 
     private String basicType2GOType(String type) {

@@ -24,7 +24,9 @@ public class MysqlGenerator extends Generator{
 
     public MysqlGenerator(List<EntityInfo> EntityInfoList, GlobalInfo globalInfo){
         this.entityInfoList = new ArrayList<>();
-        entityInfoList.addAll(EntityInfoList);
+        for (EntityInfo entityInfo : EntityInfoList){
+            entityInfoList.add(entityInfo.clone());
+        }
         this.globalInfo = globalInfo;
         replicationInfoList = new ArrayList<>();
         shardingInfoList = new ArrayList<>();
