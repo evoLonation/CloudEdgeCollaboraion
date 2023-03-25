@@ -45,8 +45,8 @@ public class LogicExpDealer extends FactoryContext {
         }).collect(Collectors.toList());
         var opList = logicFormulaExp.getConnector().stream().map(op -> {
             switch (op){
-                case "AND": return ConnectExp.OP.AND;
-                case "OR" : return ConnectExp.OP.OR;
+                case "and": return ConnectExp.OP.AND;
+                case "or" : return ConnectExp.OP.OR;
                 default: throw new UnsupportedOperationException();
             }
         }).collect(Collectors.toList());
@@ -87,6 +87,7 @@ public class LogicExpDealer extends FactoryContext {
         AtomicExp.OP op;
         switch (atomicExp.getInfixop()){
             case "=" : op = AtomicExp.OP.EQ; break;
+            case ">" : op = AtomicExp.OP.GT; break;
             // todo
             default: throw new UnsupportedOperationException();
         }

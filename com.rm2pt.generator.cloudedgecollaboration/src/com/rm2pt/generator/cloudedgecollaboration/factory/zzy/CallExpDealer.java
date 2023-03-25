@@ -1,15 +1,17 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory.zzy;
 
 
+import com.rm2pt.generator.cloudedgecollaboration.common.Keyworder;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityTypeInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.AttributeRef;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.StandardOp;
-import net.mydreamy.requirementmodel.rEMODEL.ClassiferCallExpCS;
-import net.mydreamy.requirementmodel.rEMODEL.PropertyCallExpCS;
-import net.mydreamy.requirementmodel.rEMODEL.StandardNavigationCallExpCS;
-import net.mydreamy.requirementmodel.rEMODEL.StandardOperationExpCS;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.UnaryValue;
+import net.mydreamy.requirementmodel.rEMODEL.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CallExpDealer extends FactoryContext {
 
@@ -138,6 +140,37 @@ public class CallExpDealer extends FactoryContext {
             return new SOIsUndefined(variable);
         default:
             throw new UnsupportedOperationException();
+        }
+    }
+    public abstract class OCRes{
+
+    }
+    public class OCGenerateId extends OCRes {
+
+    }
+    public class OCThirdParty extends  OCRes{
+        public String operationName;
+        public List<UnaryValue> unaryValueList;
+
+        public OCThirdParty(String operationName, List<UnaryValue> unaryValueList) {
+            this.operationName = operationName;
+            this.unaryValueList = unaryValueList;
+        }
+    }
+    public OCRes dealOperationCall(OperationCallExpCS operationCallExpCS){
+        var name = operationCallExpCS.getName();
+        if(name.equals("generateId")){
+            return new OCGenerateId();
+        }else {
+            var params = operationCallExpCS.getParameters();
+            List<UnaryValue> paramsList = new ArrayList<>();
+            params.forEach(param -> {
+                if(param.getObjectproperty() != null){
+                    var ret = (PCAttribute)dealPropertyCall(param.getObjectproperty());
+                    paramsList.add(ret.attributeRef);
+                }
+            });
+            return new OCThirdParty(name, paramsList);
         }
     }
 }

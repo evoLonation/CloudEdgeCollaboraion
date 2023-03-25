@@ -4,6 +4,7 @@ import com.rm2pt.generator.cloudedgecollaboration.info.Location;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.postcondition.PostconditionCode;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Query;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.statement.PreCondition;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.statement.Statement;
 
 import java.util.List;
 
@@ -18,11 +19,17 @@ public class OperationBody {
 
     private Location location;
 
+    private List<Statement> statementList;
+
     public OperationBody(List<Query> queryList, PreCondition preCondition, PostconditionCode postcondition, Location location) {
         this.queryList = queryList;
         this.preCondition = preCondition;
         this.postcondition = postcondition;
         this.location = location;
+    }
+
+    public OperationBody(List<Statement> statementList) {
+        this.statementList = statementList;
     }
 
     public Location getLocation() {

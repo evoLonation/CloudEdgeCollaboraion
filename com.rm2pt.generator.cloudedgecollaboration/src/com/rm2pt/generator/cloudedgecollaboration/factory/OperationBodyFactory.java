@@ -1,5 +1,6 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory;
 
+import com.rm2pt.generator.cloudedgecollaboration.common.Keyworder;
 import com.rm2pt.generator.cloudedgecollaboration.factory.zzy.querystore.QueryDealer;
 import com.rm2pt.generator.cloudedgecollaboration.factory.zzy.querystore.StoreDealer;
 import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
@@ -9,12 +10,10 @@ import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.OperationBo
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.postcondition.PostconditionCode;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.CollectionOp;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.select.Query;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.statement.Assign;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.statement.IfBlock;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.statement.PreCondition;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.statement.Statement;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.statement.*;
 import net.mydreamy.requirementmodel.rEMODEL.Contract;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +29,10 @@ public class OperationBodyFactory{
         this.contract = contract;
         this.operationInfo = operationInfo;
         this.serviceInfo = serviceInfo;
-        this.entityInfoMap = entityInfoMap;
+        // todo 所有的entityName都是首字母小写，待修复
+        entityInfoMap.values().forEach(entityInfo -> entityInfo.setName(Keyworder.firstUpperCase(entityInfo.getName())));
+        this.entityInfoMap = new HashMap<>();
+        entityInfoMap.values().forEach(entityInfo -> this.entityInfoMap.put(entityInfo.getName(), entityInfo));
     }
 
     private List<Query> queryList;
@@ -41,9 +43,11 @@ public class OperationBodyFactory{
         StatementFactory statementFactory = new StatementFactory(contract, operationInfo, serviceInfo, entityInfoMap);
         statementFactory.factory();
         List<Statement> statementList = statementFactory.getStatementList();
-        statementList.forEach(this::dealStatement);
-        queryList = queryDealer.getQueries();
-        operationBody = new OperationBody(queryList, preCondition, postconditionCode, serviceInfo.getLocation());
+//        statementList.forEach(this::dealStatement);
+        // todo
+        operationBody = new OperationBody(statementList);
+//        queryList = queryDealer.getQueries();
+//        operationBody = new OperationBody(queryList, preCondition, postconditionCode, serviceInfo.getLocation());
     }
 
     public OperationBody getOperationBody(){
@@ -63,7 +67,9 @@ public class OperationBodyFactory{
             storeDealer.attributeChanged(assign.getLeft().getVariable(), assign.getLeft().getAttribute());
         }else if(statement instanceof IfBlock){
             // todo
-        }else {
+        }else if(statement instanceof ResultAssign) {
+
+        }else{
             throw new UnsupportedOperationException();
         }
     }

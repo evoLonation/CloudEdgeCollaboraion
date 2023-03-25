@@ -7,7 +7,6 @@ import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.Variable;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.logicExp.ExpType;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.statement.*;
-import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.Bool;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.RValue;
 import net.mydreamy.requirementmodel.rEMODEL.*;
 import org.eclipse.emf.ecore.EObject;
@@ -49,14 +48,16 @@ public class StatementFactory extends FactoryContext {
 
     private void buildDefinition() {
         Definition definition = contract.getDef();
-        definition.getVariable().forEach(this::dealDefVariable);
+        if(definition != null){
+            definition.getVariable().forEach(this::dealDefVariable);
+        }
     }
 
     private void dealDefVariable(VariableDeclarationCS variableDeclaration){
         var variable = new Variable(variableDeclaration.getName(), getType(variableDeclaration.getType()), Variable.ScopeType.DEFINITION);
-        var initExp = variableDeclaration.getInitExpression();
+        EObject initExp = variableDeclaration.getInitExpression();
         if(initExp instanceof LogicFormulaExpCS){
-            initExp = (OCLExpressionCS) ((LogicFormulaExpCS) initExp).getAtomicexp().get(0);
+            initExp = ((AtomicExpression) ((LogicFormulaExpCS) initExp).getAtomicexp().get(0)).getLeftside();
             if(initExp instanceof PropertyCallExpCS) {
                 var ret = callExpDealer.dealPropertyCall((PropertyCallExpCS) initExp);
                 if(ret instanceof CallExpDealer.PCAttribute) {
@@ -68,8 +69,11 @@ public class StatementFactory extends FactoryContext {
                     var sourceVar = ((CallExpDealer.PCAssociation) ret).variable;
                     associationDealer.dealAssGet(variable, sourceVar, ass);
                 }else{throw new UnsupportedOperationException();}
-            }else if(initExp instanceof IteratorExpDealer){
+            }else if(initExp instanceof IteratorExpCS){
                 iteratorExpDealer.dealIteratorExp((IteratorExpCS) initExp, variable);
+            }else if(initExp instanceof OperationCallExpCS){
+                var ret = (CallExpDealer.OCGenerateId)callExpDealer.dealOperationCall((OperationCallExpCS) initExp);
+                addStatement(new GenerateId(variable));
             }else{throw new UnsupportedOperationException();}
         }else if(initExp instanceof LiteralExpCS){
             // todo
@@ -80,8 +84,8 @@ public class StatementFactory extends FactoryContext {
     private void buildPrecondition(){
         var exp = contract.getPre().getOclexp();
         if(exp instanceof BooleanLiteralExpCS){
-            var bool = (Bool)rValueDealer.getLiteralValue((BooleanLiteralExpCS)exp);
-            check(bool.getValue());
+            var bool = rValueDealer.getLiteralValue((BooleanLiteralExpCS)exp);
+            check(bool.getValue().equals("true"));
         }else if(exp instanceof LogicFormulaExpCS){
             var logicExp = logicExpDealer.dealLogicFormulaExp((LogicFormulaExpCS) exp, ExpType.PRECONDITION);
             addStatement(new PreCondition(logicExp));
@@ -101,14 +105,18 @@ public class StatementFactory extends FactoryContext {
             });
             outExp = ((LetExpCS) outExp).getInExpression();
         }
-        check(outExp instanceof LogicFormulaExpCS);
-        ((LogicFormulaExpCS)outExp).getAtomicexp().forEach(e ->{
-            if(e instanceof AtomicExpression){
-                dealSingleStatement((AtomicExpression) e);
-            }else if(e instanceof IfExpCS){
-                dealIfExp((IfExpCS) e);
-            }else{throw new UnsupportedOperationException();}
-        });
+        if(outExp instanceof LogicFormulaExpCS){
+            ((LogicFormulaExpCS)outExp).getAtomicexp().forEach(e ->{
+                if(e instanceof AtomicExpression){
+                    dealSingleStatement((AtomicExpression) e);
+                }else if(e instanceof IfExpCS){
+                    dealIfExp((IfExpCS) e);
+                }else{throw new UnsupportedOperationException();}
+            });
+        }else if(outExp instanceof IfExpCS){
+            dealIfExp((IfExpCS) outExp);
+        }
+
     }
 
     private void dealSingleStatement(AtomicExpression atomicExp){
@@ -118,7 +126,10 @@ public class StatementFactory extends FactoryContext {
             if(left instanceof StandardNavigationCallExpCS){
                 // todo includes, excludes
 
-            }else{throw new UnsupportedOperationException();}
+            }else if(left instanceof OperationCallExpCS){
+                var ret = (CallExpDealer.OCThirdParty)callExpDealer.dealOperationCall((OperationCallExpCS) left);
+                addStatement(new ThirdParty(ret.operationName, ret.unaryValueList));
+            }{throw new UnsupportedOperationException();}
         } else {
             check(atomicExp.getInfixop().equals("="));
             var right = atomicExp.getRightside();
@@ -143,9 +154,19 @@ public class StatementFactory extends FactoryContext {
                     addStatement(new GlobalAssign(((CallExpDealer.PCGlobalVariable) ret).variable, sourceVar));
                 }else{throw new UnsupportedOperationException();}
             }else if(left instanceof VariableExpCS){
+                // 一个是globalVariable的赋值，一个是result = ...
                 var targetVar = getVariable(left);
-                var sourceVar = getVariable(right);
-                addStatement(new GlobalAssign(targetVar, sourceVar));
+                if(targetVar.getScopeType() == Variable.ScopeType.RETURN){
+                    if (right instanceof VariableExpCS){
+                        addStatement(new ResultAssign(((VariableExpCS) right).getSymbol()));
+                    }else {
+                        addStatement(new ResultAssign("true"));
+                    }
+                }else{
+                    var sourceVar = getVariable(right);
+                    addStatement(new GlobalAssign(targetVar, sourceVar));
+                }
+
             }else{throw new UnsupportedOperationException();}
         }
     }

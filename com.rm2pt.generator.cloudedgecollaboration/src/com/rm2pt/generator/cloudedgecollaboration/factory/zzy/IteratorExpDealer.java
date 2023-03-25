@@ -54,13 +54,13 @@ public class IteratorExpDealer extends FactoryContext {
         var internalVar = getInternalVar(iteratorExp.getVaribles(), source.getEntityInfo());
         var isMulti = true;
         switch (iteratorExp.getIterator()) {
-        case "any()":
+        case "any":
             isMulti = false;
-        case "select()":
+        case "select":
             var condition = new Condition(targetVar, source, internalVar, logicExpDealer.dealOCLExp(iteratorExp.getExp(), ExpType.COLLECTION), isMulti);
             addStatement(condition);
             break;
-        case "collect()":
+        case "collect":
             // todo
         default: throw new UnsupportedOperationException();
         }

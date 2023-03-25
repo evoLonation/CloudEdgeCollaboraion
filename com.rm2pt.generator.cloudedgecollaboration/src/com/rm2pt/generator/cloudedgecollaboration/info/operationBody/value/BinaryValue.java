@@ -24,7 +24,7 @@ public class BinaryValue extends RValue{
     }
 
     private void check(){
-        if(left.getType() == right.getType()){
+        if(left.getType().equals(left.getType())){
             return;
         }
         throw new UnsupportedOperationException();

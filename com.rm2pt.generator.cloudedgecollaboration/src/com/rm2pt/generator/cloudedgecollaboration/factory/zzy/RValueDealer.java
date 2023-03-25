@@ -1,5 +1,6 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory.zzy;
 
+import com.rm2pt.generator.cloudedgecollaboration.info.data.BasicType;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.*;
 import net.mydreamy.requirementmodel.rEMODEL.*;
 import org.eclipse.emf.ecore.EObject;
@@ -47,12 +48,19 @@ public class RValueDealer extends FactoryContext {
     }
     public LiteralValue getLiteralValue(PrimitiveLiteralExpCS literalExp){
         if(literalExp instanceof BooleanLiteralExpCS){
-            switch (literalExp.getSymbol()){
-                case "true": return new Bool(true);
-                case "false" : return new Bool(false);
-                default: throw new UnsupportedOperationException();
+//            switch (literalExp.getSymbol()){
+//                case "true": return new Bool(true);
+//                case "false" : return new Bool(false);
+//                default: throw new UnsupportedOperationException();
+//            }
+            return new LiteralValue(literalExp.getSymbol(), new BasicType(BasicType.TypeEnum.BOOLEAN));
+        } else if(literalExp instanceof NumberLiteralExpCS){
+            if(literalExp.getSymbol().contains(".")){
+                return new LiteralValue("float64(" + literalExp.getSymbol() + ")", new BasicType(BasicType.TypeEnum.REAL));
+            }else{
+                return new LiteralValue("int64(" + literalExp.getSymbol() + ")", new BasicType(BasicType.TypeEnum.INTEGER));
             }
-        } else {
+        }else{
             // todo 其他字面量
             throw new UnsupportedOperationException();
         }

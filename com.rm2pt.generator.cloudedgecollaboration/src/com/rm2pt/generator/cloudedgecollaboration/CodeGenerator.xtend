@@ -19,62 +19,9 @@ class CodeGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		
-		for (e : resource.allContents.toIterable.filter(typeof(Entity))) {
-			fsa.generateFile("newentities/" + e.name + ".java", e.compileEntity)
-		}
 		var processor = new Processor(resource, fsa);
 		processor.process();
 		
-	}
-	
-	def compileEntity(Entity entity) { 
-	'''
-			package entities;
-			
-			import services.impl.StandardOPs;
-			import java.util.List;
-			import java.util.LinkedList;
-			import java.util.ArrayList;
-			import java.util.Arrays;
-			import java.time.LocalDate;
-			import java.io.Serializable;
-			import java.lang.reflect.Method;
-			
-			public class «entity.name»«IF entity.superEntity !== null» extends «entity.superEntity.name» «ENDIF» implements Serializable {
-				
-				/* all primary attributes */
-				«FOR attribute : entity.attributes»
-					private «attribute.type.compileType» «attribute.name»;
-				«ENDFOR»
-			}
-		'''
-	}
-	
-	/* For primary and enum type */
-	def compileType(TypeCS type) 
-	{
-		
-		if (type !== null)
-		{
-			switch type {
-				PrimitiveTypeCS : 
-					switch type {
-					case  type.name == "Boolean" : "boolean"
-					case  type.name == "String" : "String"
-					case  type.name == "Real" : "float"
-					case  type.name == "Integer" : "int"
-					case  type.name == "Date" : "LocalDate"
-					default: ""
-				}
-				EnumEntity : type.name
-				EntityType : type.entity.name
-				default: ""
-			}
-		}			
-		else 
-		{
-			""
-		}	
 	}
 	
 }

@@ -1,5 +1,6 @@
 package com.rm2pt.generator.cloudedgecollaboration.factory.zzy;
 
+import com.rm2pt.generator.cloudedgecollaboration.common.Keyworder;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.BasicType;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityTypeInfo;
@@ -24,7 +25,7 @@ public class FactoryContext {
     private final Stack<List<Statement>> statementListStack;
 
     protected final void addStatement(Statement statement){
-        statementListStack.pop().add(statement);
+        statementListStack.peek().add(statement);
     }
     protected final void pushLayer(){
         statementListStack.push(new ArrayList<>());
