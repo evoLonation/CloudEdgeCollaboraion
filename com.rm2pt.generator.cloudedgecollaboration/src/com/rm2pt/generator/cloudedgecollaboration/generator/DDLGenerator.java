@@ -9,6 +9,8 @@ import com.rm2pt.generator.cloudedgecollaboration.info.data.EntityInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 // todo 不要直接生成.sql文件，而是配合MysqlGenerator生成部署文件
 public class DDLGenerator{
@@ -38,7 +40,7 @@ public class DDLGenerator{
 
             List<AttributeStr> attributes = new ArrayList<>();
             for (EntityInfo.Attribute attr : entityInfo.getAttributeList()) {
-                if (attr.getName().equals(idName)){
+                if (attr.getName().equals(idName) || isInAssociation(entityInfo, attr)){
                     continue;
                 }
                 String attrName = attr.getName();
@@ -66,6 +68,13 @@ public class DDLGenerator{
             DDLEntityList.add(entityStr);
         }
         DDLText = EntityTemplate.SQLContext(DDLEntityList);
+    }
+
+    private boolean isInAssociation(EntityInfo entityInfo, EntityInfo.Attribute attribute){
+        String attrName = attribute.getName();
+        Map<String, EntityInfo.Association> assoMap = entityInfo.getAssociationMap();
+        EntityInfo.Association association = assoMap.get(attrName);
+        return Objects.nonNull(association);
     }
 
     private String basicType2SQLType(String type) {

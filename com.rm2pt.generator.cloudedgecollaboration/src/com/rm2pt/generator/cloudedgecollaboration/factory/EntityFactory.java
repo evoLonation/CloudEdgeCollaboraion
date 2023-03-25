@@ -57,8 +57,9 @@ public class EntityFactory {
             this.infoList.add(info);
         }
         addRef2Association();
+        addNonMultiAsso2Attr();
         generateMaps();
-//        outputEntityInfoListForDebug();
+        outputEntityInfoListForDebug();
     }
 
     public void outputEntityInfoListForDebug() { //if there is any problem with EntityInfo, use this to debug
@@ -124,6 +125,22 @@ public class EntityFactory {
             entityInfo.setAssociationMap(assoMap);
             entityInfo.setAttributeMap(attrMap);
             entityInfo.setKeyTypeMap(keyTypeMap);
+        }
+    }
+
+    private void addNonMultiAsso2Attr(){
+        for (EntityInfo entityInfo : infoList){
+            for(EntityInfo.Association association : entityInfo.getAssociationList()){
+                if (!association.isMulti()){
+                    if (!(association instanceof EntityInfo.ForeignKeyAss)){
+                        throw new AssertionError("association is not a foreign key!");
+                    }
+                    EntityInfo.Attribute attribute = new EntityInfo.Attribute();
+                    attribute.setName(((EntityInfo.ForeignKeyAss) association).getName());
+                    attribute.setType(((EntityInfo.ForeignKeyAss) association).getType());
+                    entityInfo.addAttribute(attribute);
+                }
+            }
         }
     }
 
