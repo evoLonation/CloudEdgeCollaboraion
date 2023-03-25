@@ -29,10 +29,11 @@ public class OperationBodyFactory{
         this.contract = contract;
         this.operationInfo = operationInfo;
         this.serviceInfo = serviceInfo;
+        this.entityInfoMap = entityInfoMap;
         // todo 所有的entityName都是首字母小写，待修复
-        entityInfoMap.values().forEach(entityInfo -> entityInfo.setName(Keyworder.firstUpperCase(entityInfo.getName())));
-        this.entityInfoMap = new HashMap<>();
-        entityInfoMap.values().forEach(entityInfo -> this.entityInfoMap.put(entityInfo.getName(), entityInfo));
+//        entityInfoMap.values().forEach(entityInfo -> entityInfo.setName(Keyworder.firstUpperCase(entityInfo.getName())));
+//        this.entityInfoMap = new HashMap<>();
+//        entityInfoMap.values().forEach(entityInfo -> this.entityInfoMap.put(entityInfo.getName(), entityInfo));
     }
 
     private List<Query> queryList;

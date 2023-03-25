@@ -19,7 +19,6 @@ public class OperationBody {
 
     private Location location;
 
-    private List<Statement> statementList;
 
     public OperationBody(List<Query> queryList, PreCondition preCondition, PostconditionCode postcondition, Location location) {
         this.queryList = queryList;
@@ -28,9 +27,7 @@ public class OperationBody {
         this.location = location;
     }
 
-    public OperationBody(List<Statement> statementList) {
-        this.statementList = statementList;
-    }
+
 
     public Location getLocation() {
         return location;
@@ -46,6 +43,14 @@ public class OperationBody {
 
     public PostconditionCode getPostcondition() {
         return postcondition;
+    }
+    public OperationBody(List<Statement> statementList) {
+        this.statementList = statementList;
+    }
+    private List<Statement> statementList;
+
+    public List<Statement> getStatementList() {
+        return statementList;
     }
 }
 

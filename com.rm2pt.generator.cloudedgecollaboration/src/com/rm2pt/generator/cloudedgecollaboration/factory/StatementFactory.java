@@ -129,7 +129,9 @@ public class StatementFactory extends FactoryContext {
             }else if(left instanceof OperationCallExpCS){
                 var ret = (CallExpDealer.OCThirdParty)callExpDealer.dealOperationCall((OperationCallExpCS) left);
                 addStatement(new ThirdParty(ret.operationName, ret.unaryValueList));
-            }{throw new UnsupportedOperationException();}
+            }else if(left instanceof StandardOperationExpCS){
+                // todo oclIsNew
+            }else{throw new UnsupportedOperationException();}
         } else {
             check(atomicExp.getInfixop().equals("="));
             var right = atomicExp.getRightside();

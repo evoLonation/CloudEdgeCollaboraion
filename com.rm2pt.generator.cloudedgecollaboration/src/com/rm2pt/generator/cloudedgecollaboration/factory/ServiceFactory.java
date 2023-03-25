@@ -157,10 +157,10 @@ public class ServiceFactory {
             }
             return type;
         } else if (typeCS instanceof EntityTypeImpl) {
-            System.out.println("entity name: " + ((EntityTypeImpl) typeCS).getEntity().getName().toLowerCase());
-            EntityInfo entityInfo = entityMap.get(((EntityTypeImpl) typeCS).getEntity().getName().toLowerCase());
+            System.out.println("entity name: " + ((EntityTypeImpl) typeCS).getEntity().getName());
+            EntityInfo entityInfo = entityMap.get(((EntityTypeImpl) typeCS).getEntity().getName());
             if (entityInfo == null) {
-                throw new RuntimeException("Entity not found: " + ((EntityTypeImpl) typeCS).getEntity().getName().toLowerCase());
+                throw new RuntimeException("Entity not found: " + ((EntityTypeImpl) typeCS).getEntity().getName());
             }
             return new EntityTypeInfo(entityInfo);
         } else {

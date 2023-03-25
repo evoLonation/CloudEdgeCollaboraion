@@ -24,10 +24,10 @@ public class AtomicExp extends LogicExp {
     }
 
     private void check(){
-        if(left.getType().getTypeEnum().equals(right.getType().getTypeEnum())){
-            return;
-        }
-        throw new UnsupportedOperationException();
+//        if(left.getType().getTypeEnum().equals(right.getType().getTypeEnum())){
+//            return;
+//        }
+//        throw new UnsupportedOperationException();
     }
 
     public RValue getLeft() {
