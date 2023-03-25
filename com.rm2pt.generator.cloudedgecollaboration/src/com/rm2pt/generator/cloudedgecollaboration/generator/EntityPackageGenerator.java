@@ -37,7 +37,7 @@ public class EntityPackageGenerator extends Generator {
 
             List<AttributeStr> attributes = new ArrayList<>();
             for (EntityInfo.Attribute attr : entityInfo.getAttributeList()) {
-                if (attr.getName().equals(idName) || isInAssociation(entityInfo, attr)){
+                if (attr.getName().equals(idName)){
                     continue;
                 }
                 String attrName = attr.getName();
@@ -47,20 +47,20 @@ public class EntityPackageGenerator extends Generator {
                         basicType2GOType(attrType),
                         Keyworder.camelToUnderScore(attrName)));
             }
-            for (EntityInfo.Association asso : entityInfo.getAssociationList()) {
-                if (!(asso instanceof EntityInfo.ForeignKeyAss)) {
-                    throw new AssertionError("association is not a foreign key!");
-                }
-                if (asso.isMulti()) {
-                    continue;
-                }
-                String assoName = ((EntityInfo.ForeignKeyAss) asso).getRefAttrName();
-                String assoType = ((EntityInfo.ForeignKeyAss) asso).getType().getTypeEnum().name();
-                attributes.add(new AttributeStr(
-                        Keyworder.firstUpperCase(assoName),
-                        basicType2GOType(assoType),
-                        Keyworder.camelToUnderScore(assoName)));
-            }
+//            for (EntityInfo.Association asso : entityInfo.getAssociationList()) {
+//                if (!(asso instanceof EntityInfo.ForeignKeyAss)) {
+//                    throw new AssertionError("association is not a foreign key!");
+//                }
+//                if (asso.isMulti()) {
+//                    continue;
+//                }
+//                String assoName = ((EntityInfo.ForeignKeyAss) asso).getRefAttrName();
+//                String assoType = ((EntityInfo.ForeignKeyAss) asso).getType().getTypeEnum().name();
+//                attributes.add(new AttributeStr(
+//                        Keyworder.firstUpperCase(assoName),
+//                        basicType2GOType(assoType),
+//                        Keyworder.camelToUnderScore(assoName)));
+//            }
 
             EntityStr entityStr = new EntityStr(entityName, primaryKey, attributes);
             GOEntityList.add(entityStr);
