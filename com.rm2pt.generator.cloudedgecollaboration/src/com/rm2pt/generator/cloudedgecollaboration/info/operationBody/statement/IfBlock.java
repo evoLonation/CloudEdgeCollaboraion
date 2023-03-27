@@ -12,4 +12,12 @@ public class IfBlock extends Statement {
         this.condition = condition;
         this.ifTrue = ifTrue;
     }
+
+    public LogicExp getCondition() {
+        return condition;
+    }
+
+    public List<Statement> getIfTrue() {
+        return ifTrue;
+    }
 }

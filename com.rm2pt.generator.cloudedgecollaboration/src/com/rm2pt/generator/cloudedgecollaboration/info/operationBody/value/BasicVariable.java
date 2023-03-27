@@ -18,4 +18,8 @@ public class BasicVariable extends UnaryValue{
     public BasicType getType() {
         return variable.mustGetBasicType();
     }
+
+    public Variable getVariable() {
+        return variable;
+    }
 }

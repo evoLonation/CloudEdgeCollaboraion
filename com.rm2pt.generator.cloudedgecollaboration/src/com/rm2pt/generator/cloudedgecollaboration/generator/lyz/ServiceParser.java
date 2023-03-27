@@ -94,12 +94,12 @@ public class ServiceParser {
     }
 
     public static String getHPOBodyString(OperationInfo operation) {
-        OperationBodyGenerator operationBodyGenerator = new OperationBodyGenerator(operation.getOperationBody());
+        OperationBodyGenerator operationBodyGenerator = new OperationBodyGenerator(operation.getOperationBody(), operation.getConcurrencyType() != OperationInfo.ConcurrencyType.WEAKCONSISTENCY);
         return operationBodyGenerator.generateHighPriority();
     }
 
     public static String getOperationBodyString(OperationInfo operation) {
-        OperationBodyGenerator operationBodyGenerator = new OperationBodyGenerator(operation.getOperationBody());
+        OperationBodyGenerator operationBodyGenerator = new OperationBodyGenerator(operation.getOperationBody(), operation.getConcurrencyType() != OperationInfo.ConcurrencyType.WEAKCONSISTENCY);
         return operationBodyGenerator.generate();
     }
 
