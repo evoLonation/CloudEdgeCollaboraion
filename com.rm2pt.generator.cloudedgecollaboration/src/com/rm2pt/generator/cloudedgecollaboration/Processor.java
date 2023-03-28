@@ -34,7 +34,6 @@ public class Processor {
 		System.out.println(Keyworder.camelToUnderScore("MyNameIsZzy"));
 
 		GlobalInfo globalInfo = new GlobalInfoBuilder().build();
-		// 中间代码生成阶段
 		EntityFactory entityFactory = new EntityFactory(domainModel.getEntity());
 		entityFactory.factory();
 		new EntityPackageGenerator(entityFactory.getEntityList()).generate();
@@ -43,7 +42,8 @@ public class Processor {
 				useCaseModel.getContract(), entityFactory.getEntityMap());
 		serviceFactory.factory();
 		new ServicePackageGenerator(serviceFactory.getServiceList(),
-				serviceFactory.getOperation(OperationInfo.ConcurrencyType.HIGHPRIORITY)).generate();
+				serviceFactory.getOperation(OperationInfo.ConcurrencyType.HIGHPRIORITY), globalInfo).generate();
+		new CommonPackageGenerator(globalInfo, serviceFactory.getServiceList()).generate();
 		new ConfigGenerator(serviceFactory.getOperation(OperationInfo.ConcurrencyType.HIGHPRIORITY), globalInfo)
 				.generate();
 		new ServerPackageGenerator(serviceFactory.getServiceList(), globalInfo).generate();

@@ -80,7 +80,7 @@ public class DDLGenerator{
     private String basicType2SQLType(String type) {
         switch (type) {
             case "INTEGER":
-                return "INT64";
+                return "BIGINT";
             case "TIME":
                 return "DATETIME";
             case "REAL":
@@ -88,7 +88,7 @@ public class DDLGenerator{
             case "STRING":
                 return "VARCHAR(255)";
             case "BOOLEAN":
-                return "BOOLEAN";
+                return "BOOL";
             default:
                 throw new RuntimeException("Unknown entityType: " + type);
         }

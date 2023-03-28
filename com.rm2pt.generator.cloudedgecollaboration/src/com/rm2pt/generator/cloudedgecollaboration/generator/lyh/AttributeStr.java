@@ -23,15 +23,15 @@ public class AttributeStr {
 
     private static String getDefaultValue(String type){
         switch (type){
-            case "INT64":
+            case "BIGINT":
                 return "0";
             case "DATETIME":
-                return "";
+                return "'0001-01-01 00:00:00'";
             case "DOUBLE":
                 return "0";
             case "VARCHAR(255)":
-                return "";
-            case "BOOLEAN":
+                return "''";
+            case "BOOL":
                 return "FALSE";
             default:
                 throw new RuntimeException("Unknown SQLType: " + type);

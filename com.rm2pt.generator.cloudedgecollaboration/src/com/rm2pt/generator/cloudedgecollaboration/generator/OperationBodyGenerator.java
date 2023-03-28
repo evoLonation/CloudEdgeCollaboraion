@@ -28,6 +28,7 @@ public class OperationBodyGenerator {
     private List<Condition> conditionList;
     private Map<Variable, Set<String>> useSet;
     private Map<Variable, Set<String>> changeSet;
+    private Set<Variable> generateIdSet;
     private Set<Variable> variableSet;
     private boolean isConsistency;
     private List<Assign> assignList;
@@ -43,7 +44,7 @@ public class OperationBodyGenerator {
         useSet = new HashMap<>();
         changeSet = new HashMap<>();
         conditionList.forEach(condition -> addUse(condition.getTargetVar(), condition.getSource().getEntityInfo().getIdAttribute()));
-        conditionList.forEach(condition -> addChange(condition.getTargetVar(), condition.getSource().getEntityInfo().getIdAttribute()));
+//        conditionList.forEach(condition -> addChange(condition.getTargetVar(), condition.getSource().getEntityInfo().getIdAttribute()));
         statementList.forEach(this::dealChangeUse);
         var ifExp = statementList.stream().filter(statement -> statement instanceof IfBlock).map(e -> (IfBlock)e).findAny().orElse(null);
         if(ifExp == null){
@@ -54,6 +55,21 @@ public class OperationBodyGenerator {
             resultAssign = ifExp.getIfTrue().stream().filter(statement -> statement instanceof ResultAssign).map(e -> (ResultAssign)e).findAny().orElse(null);
             ifLogicExp = ifExp.getCondition();
             assignList = ifExp.getIfTrue().stream().filter(e -> e instanceof Assign).map(e -> (Assign)e).collect(Collectors.toList());
+        }
+        useSet.keySet().stream().filter(v -> v.getName().equals(resultAssign.getValue())).findAny().ifPresent(v ->
+            useSet.get(v).addAll(v.mustGetEntity().getAttributeList().stream().map(EntityInfo.Attribute::getName).collect(Collectors.toList())));
+        changeSet.forEach((v, s) -> {
+            if(v.getScopeType() == Variable.ScopeType.LET){
+                if(s.stream().noneMatch(a -> a.equals(v.mustGetEntity().getIdAttribute().getName()))){
+                    assignList.add(new GenerateIdAssign(new AttributeRef(v, v.mustGetEntity().getIdAttribute())));
+                    changeSet.get(v).add(v.mustGetEntity().getIdAttribute().getName());
+                }
+            }
+        });
+    }
+    private static class GenerateIdAssign extends Assign{
+        public GenerateIdAssign(AttributeRef left) {
+            super(left, left);
         }
     }
     private void dealChangeUse(Statement statement){
@@ -101,39 +117,46 @@ public class OperationBodyGenerator {
     private String generateStore(Variable variable){
         var entityInfo = variable.mustGetEntity();
         var table = entityInfo.getName();
-        var attrList = new ArrayList<>(useSet.get(variable));
+        var attrList = new ArrayList<>(changeSet.get(variable));
         if(variable.getScopeType() == Variable.ScopeType.LET){
             if(entityInfo.getStorageType() == EntityInfo.StorageType.DEFAULT){
             	return OperationBodyTemplate.generateSingleInsert(variable.getName(), table, attrList);
-            }else if(entityInfo.getStorageType() == EntityInfo.StorageType.HIGHSTORE){
-                return OperationBodyTemplate.generateReplicationInsert(variable.getName(), table, attrList);
             }else if(entityInfo.getStorageType() == EntityInfo.StorageType.HIGHREAD){
+                return OperationBodyTemplate.generateReplicationInsert(variable.getName(), table, attrList);
+            }else if(entityInfo.getStorageType() == EntityInfo.StorageType.HIGHSTORE){
                 return OperationBodyTemplate.generateShardingInsert(false, entityInfo.getIdAttribute().getName(), variable.getName(), table, attrList);
             }else{throw new UnsupportedOperationException();}
         }else{
             if(entityInfo.getStorageType() == EntityInfo.StorageType.DEFAULT){
                 return OperationBodyTemplate.generateSingleUpdate(variable.getName(), table, attrList);
-            }else if(entityInfo.getStorageType() == EntityInfo.StorageType.HIGHSTORE){
-                return OperationBodyTemplate.generateReplicationUpdate(variable.getName(), table, attrList);
             }else if(entityInfo.getStorageType() == EntityInfo.StorageType.HIGHREAD){
+                return OperationBodyTemplate.generateReplicationUpdate(variable.getName(), table, attrList);
+            }else if(entityInfo.getStorageType() == EntityInfo.StorageType.HIGHSTORE){
                 return OperationBodyTemplate.generateShardingUpdate(false, entityInfo.getIdAttribute().getName(), variable.getName(), table, attrList);
             }else{throw new UnsupportedOperationException();}
         }
     }
     private String generatePostcondition() {
+        var result = resultAssign.getValue();
+        if(result.equals("item")){
+            result = "*" + result;
+        }
     	if(ifLogicExp == null) {
     		return OperationBodyTemplate.generatePostcondition(
                     assignList.stream().map(this::generateAssign).collect(Collectors.toList()),
-                    useSet.keySet().stream().map(this::generateStore).collect(Collectors.toList()),
-                    resultAssign.getValue());
+                    changeSet.keySet().stream().map(this::generateStore).collect(Collectors.toList()),
+                    result);
         }else{
             return OperationBodyTemplate.generateIfPostcondition(generateLogicExp(ifLogicExp),
                     assignList.stream().map(this::generateAssign).collect(Collectors.toList()),
-                    useSet.keySet().stream().map(this::generateStore).collect(Collectors.toList()),
-                    resultAssign.getValue());
+                    changeSet.keySet().stream().map(this::generateStore).collect(Collectors.toList()),
+                    result);
         }
     }
     public String generateAssign(Assign assign){
+        if(assign instanceof GenerateIdAssign){
+            return generateRValue(assign.getLeft()) + " = p.generateId()";
+        }
         return generateRValue(assign.getLeft()) + " = " + generateRValue(assign.getRight());
     }
 
@@ -157,19 +180,16 @@ public class OperationBodyGenerator {
                     Collections.singletonList(generateRValue(rightValue)));
         }else if(type == EntityInfo.StorageType.HIGHREAD){
             return OperationBodyTemplate.generateReplicationSelect(false, isConsistency, condition.getTargetVar().getName(), entityInfo.getName(),
-                    attrList, Keyworder.camelToUnderScore(entityInfo.getIdAttribute().getName()) + " = ?",
+                    attrList, entityInfo.getIdAttribute().getName() + " = ?",
                     Collections.singletonList(generateRValue(rightValue)));
         }else if(type == EntityInfo.StorageType.HIGHSTORE){
             return OperationBodyTemplate.generateShardingSelect(false, condition.getTargetVar().getName(), generateRValue(rightValue),
-                    entityInfo.getName(), attrList, Keyworder.camelToUnderScore(entityInfo.getIdAttribute().getName()));
+                    entityInfo.getName(), attrList, entityInfo.getIdAttribute().getName());
         }else{throw new UnsupportedOperationException();}
     }
 
     public String generateVariable(Variable variable){
-        return variable.getName() + " *" + TypeGenerator.generateGoType(variable.getType());
-    }
-    public String generateSelect(){
-        return "select";
+        return variable.getName() + " := new(" + TypeGenerator.generateGoType(variable.getType()) + ")";
     }
     public String generatePrecondition(){
         if(preCondition == null){
@@ -196,7 +216,7 @@ public class OperationBodyGenerator {
                 case LT: opstr = " < "; break;
                 default:throw new UnsupportedOperationException();
             }
-            return generateRValue(((AtomicExp) logicExp).getLeft()) + op + generateRValue(((AtomicExp) logicExp).getRight());
+            return generateRValue(((AtomicExp) logicExp).getLeft()) + opstr + generateRValue(((AtomicExp) logicExp).getRight());
         }else if(logicExp instanceof IsUndefinedExp){
             String op = ((IsUndefinedExp) logicExp).isUndefined() ? " == " : " != ";
             return ((IsUndefinedExp) logicExp).getVariable().getName() + op + "nil";
@@ -226,7 +246,9 @@ public class OperationBodyGenerator {
             return ((AttributeRef) rValue).getVariable().getName() + "." + ((AttributeRef) rValue).getAttribute().getName();
         } else if (rValue instanceof BasicVariable) {
             return ((BasicVariable)rValue).getVariable().getName();
-        } else{
+        } else if(rValue instanceof CastFloat){
+            return "float64(" + generateRValue(((CastFloat)rValue).getrValue()) + ")";
+        }else{
             throw new UnsupportedOperationException();
         }
     }
@@ -234,8 +256,9 @@ public class OperationBodyGenerator {
 
 
     public String generateHighPriority(){
-    	return OperationBodyTemplate.generate(variableSet.stream().map(this::generateVariable).collect(Collectors.toList()),
-                conditionList.stream().map(this::generateCondition).collect(Collectors.toList()),
-                generatePrecondition(), "postcondition");
+        return "return";
+//    	return OperationBodyTemplate.generate(variableSet.stream().map(this::generateVariable).collect(Collectors.toList()),
+//                conditionList.stream().map(this::generateCondition).collect(Collectors.toList()),
+//                generatePrecondition(), "postcondition");
     }
 }

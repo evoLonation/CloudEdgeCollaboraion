@@ -5,17 +5,18 @@ import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo
 import java.util.List
 
 class ContextTemplate {
-	static def String generateContext(List<ServiceInfo> serviceInfoList, List<OperationInfo> highPriorityOperationList) {
+	static def String generateContext(List<ServiceInfo> serviceInfoList, List<OperationInfo> highPriorityOperationList, String project) {
 		'''
 		package service
 		
 		import (
 			"fmt"
-			"go-high-currency/common"
-			"go-high-currency/config"
+			"«project»/common"
+			"«project»/config"
 		
 			redis "github.com/go-redis/redis/v8"
 			"github.com/jmoiron/sqlx"
+			"github.com/sony/sonyflake"
 		)
 		
 		type context struct {
@@ -27,6 +28,15 @@ class ContextTemplate {
 			shardingDBNum    int64
 			shardingTableNum int64
 			redisClusterNum  int64
+			flake            *sonyflake.Sonyflake
+		}
+		
+		func (p *context) generateId() int64 {
+			id, err := p.flake.NextID()
+			if err != nil {
+				log.Fatal(err)
+			}
+			return int64(id)
 		}
 		
 		func (p *context) shardingTableNameInteger(tableName string, id int64) (*sqlx.DB, string) {
@@ -57,6 +67,7 @@ class ContextTemplate {
 				shardingDBNum:    conf.ShardingDB.DatabaseNumber,
 				shardingTableNum: conf.ShardingDB.TableNumber,
 				redisClusterNum:  conf.RedisCluster.NodeNumber,
+				flake:            sonyflake.NewSonyflake(sonyflake.Settings{}),
 			}
 		}
 		

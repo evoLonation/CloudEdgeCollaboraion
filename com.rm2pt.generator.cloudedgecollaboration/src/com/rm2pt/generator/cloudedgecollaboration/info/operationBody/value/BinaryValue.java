@@ -3,8 +3,8 @@ package com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value;
 import com.rm2pt.generator.cloudedgecollaboration.info.data.BasicType;
 
 public class BinaryValue extends RValue{
-    private UnaryValue left;
-    private UnaryValue right;
+    private RValue left;
+    private RValue right;
     private OP op;
 
     @Override
@@ -20,21 +20,27 @@ public class BinaryValue extends RValue{
         this.left = left;
         this.right = right;
         this.op = op;
+        if(left.getType().getTypeEnum() == BasicType.TypeEnum.INTEGER && right.getType().getTypeEnum() == BasicType.TypeEnum.REAL){
+            this.left = new CastFloat(left);
+        }
+        if(left.getType().getTypeEnum() == BasicType.TypeEnum.REAL && right.getType().getTypeEnum() == BasicType.TypeEnum.INTEGER){
+            this.right = new CastFloat(right);
+        }
         check();
     }
 
     private void check(){
-        if(left.getType().equals(left.getType())){
+        if(left.getType().equals(right.getType())){
             return;
         }
         throw new UnsupportedOperationException();
     }
 
-    public UnaryValue getLeft() {
+    public RValue getLeft() {
         return left;
     }
 
-    public UnaryValue getRight() {
+    public RValue getRight() {
         return right;
     }
 

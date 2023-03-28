@@ -6,12 +6,12 @@ class EntityTemplate{
     static def String SQLContext(List<EntityStr> entityList){
     	'''
 «FOR entity : entityList»
-CREATE TABLE «entity.getName()» (
-«entity.getPrimaryKey().getName()» «entity.getPrimaryKey().getType()» NOT NULL DEFAULT '«entity.getPrimaryKey().getDefaultValue()»',
+CREATE TABLE `«entity.getName()»` (
+`«entity.getPrimaryKey().getName()»` «entity.getPrimaryKey().getType()» NOT NULL DEFAULT («entity.getPrimaryKey().getDefaultValue()»),
 «FOR attribute : entity.getAttributes()»
-	«attribute.getName()» «attribute.getType()» NOT NULL DEFAULT '«attribute.getDefaultValue()»',
+	`«attribute.getName()»` «attribute.getType()» NOT NULL DEFAULT («attribute.getDefaultValue()»),
 «ENDFOR»
-PRIMARY KEY («entity.getPrimaryKey().getName()»)
+PRIMARY KEY (`«entity.getPrimaryKey().getName()»`)
 );
 «ENDFOR»
 		'''
@@ -35,8 +35,8 @@ PRIMARY KEY («entity.getPrimaryKey().getName()»)
     
     static def String makeDDLContext(String projectName){
     	'''
-    	CREATE DATABASE «projectName»;
-    	USE «projectName»;
+    	CREATE DATABASE `«projectName»`;
+    	USE `«projectName»`;
     	'''
     }
 }

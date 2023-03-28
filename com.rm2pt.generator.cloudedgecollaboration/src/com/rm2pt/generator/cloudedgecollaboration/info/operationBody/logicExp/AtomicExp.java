@@ -1,5 +1,7 @@
 package com.rm2pt.generator.cloudedgecollaboration.info.operationBody.logicExp;
 
+import com.rm2pt.generator.cloudedgecollaboration.info.data.BasicType;
+import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.CastFloat;
 import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.RValue;
 
 public class AtomicExp extends LogicExp {
@@ -20,14 +22,20 @@ public class AtomicExp extends LogicExp {
         this.left = left;
         this.right = right;
         this.op = op;
+        if(left.getType().getTypeEnum() == BasicType.TypeEnum.INTEGER && right.getType().getTypeEnum() == BasicType.TypeEnum.REAL){
+            this.left = new CastFloat(left);
+        }
+        if(left.getType().getTypeEnum() == BasicType.TypeEnum.REAL && right.getType().getTypeEnum() == BasicType.TypeEnum.INTEGER){
+            this.right = new CastFloat(right);
+        }
         check();
     }
 
     private void check(){
-//        if(left.getType().getTypeEnum().equals(right.getType().getTypeEnum())){
-//            return;
-//        }
-//        throw new UnsupportedOperationException();
+        if(left.getType().getTypeEnum().equals(right.getType().getTypeEnum())){
+            return;
+        }
+        throw new UnsupportedOperationException();
     }
 
     public RValue getLeft() {

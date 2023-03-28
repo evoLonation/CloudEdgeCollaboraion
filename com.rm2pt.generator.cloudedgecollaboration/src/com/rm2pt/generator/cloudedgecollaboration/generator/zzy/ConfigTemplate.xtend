@@ -14,34 +14,35 @@ class ConfigTemplate {
 		for (var i = 0; i < redisNum; i++) {
 		    redisNumList.add(i);
 		}
+		var project2 = project.replaceAll("-", "_");
 		'''
 		httpServer:
-		  Port: 8080
+		  port: 8080
 		service:
-		  datasource: root:2002116yy@tcp(mysql:3306)/«project»?parseTime=true
+		  dataSource: root:2002116yy@tcp(mysql:3306)/«project2»?parseTime=true
 		  replicationDB:
-		    masterSource: root:2002116yy@tcp(mysql-replication-0.mysql-replication:3306)/«project»?parseTime=true
-		    readSource: root:2002116yy@tcp(mysql-read:3306)/«project»?parseTime=true
+		    masterSource: root:2002116yy@tcp(mysql-replication-0.mysql-replication:3306)/«project2»?parseTime=true
+		    readSource: root:2002116yy@tcp(mysql-read:3306)/«project2»?parseTime=true
 		  shardingDB:
 		    databaseNumber: «dbNum»
 		    tableNumber: «tableNum»
 		    dataSources: 
 		    «FOR num : dbNumList»
-		    - root:2002116yy@tcp(mysql-sharding-«num».mysql-sharding:3306)/«project»?parseTime=true
+		    - root:2002116yy@tcp(mysql-sharding-«num».mysql-sharding:3306)/«project2»?parseTime=true
 		    «ENDFOR»
 		  redisCluster:
 		    nodeNumber: «redisNum»
 		    redis:
 		    «FOR num: redisNumList»
-		    - addr: redis-cluster-«num».redis-cluster
+		    - addr: redis-cluster-«num».redis-cluster:6379
 		      password: 2002116yy
 		    «ENDFOR»
-		  highPriority:
-		  	«FOR operation: hpOperationList»
-		  	«Keyworder.firstLowerCase(operation)»:
-		  	  addr: redis-highpriority-«operation.toLowerCase()»
-		  	  password: 2002116yy
-		  	«ENDFOR»
+		highPriority:
+		  «FOR operation: hpOperationList»
+		  «Keyworder.firstLowerCase(operation)»:
+		    addr: redis-highpriority-«operation.toLowerCase()»:6379
+		    password: 2002116yy
+		  «ENDFOR»
 		'''
 	}
 	static def String generateConfig(List<String> hpOperationList){

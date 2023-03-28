@@ -6,15 +6,17 @@ import java.util.List;
 import com.rm2pt.generator.cloudedgecollaboration.generator.lyz.ContextTemplate;
 import com.rm2pt.generator.cloudedgecollaboration.generator.lyz.HighPriorityTemplate;
 import com.rm2pt.generator.cloudedgecollaboration.generator.lyz.ServiceTemplate;
+import com.rm2pt.generator.cloudedgecollaboration.info.GlobalInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.OperationInfo;
 import com.rm2pt.generator.cloudedgecollaboration.info.ServiceInfo;
 
 // todo
 public class ServicePackageGenerator extends Generator {
     private final List<ServiceInfo> serviceList;
-
-    public ServicePackageGenerator(List<ServiceInfo> serviceList, List<OperationInfo> highPriOperationList) {
+    private String projectName;
+    public ServicePackageGenerator(List<ServiceInfo> serviceList, List<OperationInfo> highPriOperationList, GlobalInfo globalInfo) {
         this.serviceList = serviceList;
+        this.projectName = globalInfo.getProjectName();
     }
 
     @Override
@@ -32,7 +34,7 @@ public class ServicePackageGenerator extends Generator {
             }
         }
 
-        golangCode = ContextTemplate.generateContext(serviceList, highPriOperationList);
+        golangCode = ContextTemplate.generateContext(serviceList, highPriOperationList, this.projectName);
         generateFile("service/context.go", golangCode);
         System.out.println("service/context.go generated");
 
@@ -45,7 +47,7 @@ public class ServicePackageGenerator extends Generator {
             String serviceFileName = "service/" +
                     service.getName().substring(0, 1).toLowerCase() + service.getName().substring(1) +
                     ".go";
-            golangCode = ServiceTemplate.generateService(service);
+            golangCode = ServiceTemplate.generateService(service, this.projectName);
             generateFile(serviceFileName, golangCode);
             System.out.println(serviceFileName + " generated");
         }

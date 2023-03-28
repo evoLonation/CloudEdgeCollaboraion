@@ -31,7 +31,7 @@ public class MysqlGenerator extends Generator{
         replicationInfoList = new ArrayList<>();
         shardingInfoList = new ArrayList<>();
         singleInfoList = new ArrayList<>();
-        makeDDL = EntityTemplate.makeDDLContext(Keyworder.camelToUnderScore(globalInfo.getProjectName()));
+        makeDDL = EntityTemplate.makeDDLContext(globalInfo.getProjectName().replaceAll("-", "_"));
     }
     // todo implement
     public void generate(){

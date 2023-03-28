@@ -24,8 +24,9 @@ class OperationBodyTemplate {
 		wg.Wait()
 		
 		// precondition
-		if «preconditionExp» {
-			return nil, errors.New("precondition unsatisfied")
+		if !(«preconditionExp») {
+			err = errors.New("precondition unsatisfied")
+			return
 		}
 		// postcondition
 		«postcondition»
@@ -34,72 +35,78 @@ class OperationBodyTemplate {
 	}
 	static def String generateSingleSelect(boolean isMulti, String variable, String table, List<String> attrList, String logicExp, List<String> paramList){
 		'''
-		if err := p.singleDB.«IF isMulti»select«ELSE»get«ENDIF»(«variable», "select «FOR attr : attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»«ENDFOR» from «Keyworder.camelToUnderScore(table)» where «logicExp»", «FOR param: paramList»«param», «ENDFOR»); err != nil {
+		if err := p.singleDB.«IF isMulti»Select«ELSE»Get«ENDIF»(«variable», "select «FOR attr : attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»«ENDFOR» from `«Keyworder.camelToUnderScore(table)»` where «logicExp»", «FOR param: paramList»«param», «ENDFOR»); err != nil {
 			if err != sql.ErrNoRows {
 				log.Fatal(errors.Wrap(err, "select or get error"))
+			}else{
+				«variable» = nil
 			}
 		}
 		'''
 	}
 	static def String generateReplicationSelect(boolean isMulti, boolean isConsistency, String variable, String table, List<String> attrList, String logicExp, List<String> paramList){
 		'''
-		if err := p.«IF isConsistency»masterDB«ELSE»readDB«ENDIF».«IF isMulti»select«ELSE»get«ENDIF»(«variable», "select «FOR attr : attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»«ENDFOR» from «Keyworder.camelToUnderScore(table)» where «logicExp»", «FOR param: paramList»«param», «ENDFOR»); err != nil {
+		if err := p.«IF isConsistency»masterDB«ELSE»readDB«ENDIF».«IF isMulti»Select«ELSE»Get«ENDIF»(«variable», "select «FOR attr : attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»«ENDFOR» from `«Keyworder.camelToUnderScore(table)»` where «logicExp»", «FOR param: paramList»«param», «ENDFOR»); err != nil {
 			if err != sql.ErrNoRows {
 				log.Fatal(errors.Wrap(err, "select or get error"))
+			}else{
+				«variable» = nil
 			}
 		}
 		'''
 	}
 	static def String generateShardingSelect(boolean isString, String variable, String idVariable, String table, List<String> attrList, String idAttr){
 		'''
-		db , tabla := p.shardingTableName«IF isString»String«ELSE»Integer«ENDIF»(«Keyworder.camelToUnderScore(table)», «idVariable»)		
-		if err := db.get(«variable», "select «FOR attr : attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»«ENDFOR» from " + table + " where «Keyworder.camelToUnderScore(idAttr)»", «idVariable»); err != nil {
+		db , table := p.shardingTableName«IF isString»String«ELSE»Integer«ENDIF»("«Keyworder.camelToUnderScore(table)»", «idVariable»)		
+		if err := db.Get(«variable», "select «FOR attr : attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»«ENDFOR» from `" + table + "` where «Keyworder.camelToUnderScore(idAttr)» = ?", «idVariable»); err != nil {
 			if err != sql.ErrNoRows {
 				log.Fatal(errors.Wrap(err, "select or get error"))
+			}else{
+				«variable» = nil
 			}
 		}
 		'''
 	}
 	static def String generateSingleInsert(String variable, String table, List<String>attrList){
 		'''
-		if _, err := p.singleDB.NamedExec("insert into «Keyworder.camelToUnderScore(table)» («FOR attr:attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»«ENDFOR») values («FOR attr:attrList SEPARATOR ', '»:«Keyworder.camelToUnderScore(attr)»«ENDFOR»)", «variable»); err != nil {
+		if _, err := p.singleDB.NamedExec("insert into `«Keyworder.camelToUnderScore(table)»` («FOR attr:attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»«ENDFOR») values («FOR attr:attrList SEPARATOR ', '»:«Keyworder.camelToUnderScore(attr)»«ENDFOR»)", «variable»); err != nil {
 			log.Fatal(errors.Wrap(err, "insert data error"))
 		}
 		'''
 	}
 	static def String generateReplicationInsert(String variable, String table, List<String>attrList){
 		'''
-		if _, err := p.masterDB.NamedExec("insert into «Keyworder.camelToUnderScore(table)» («FOR attr:attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»«ENDFOR») values («FOR attr:attrList SEPARATOR ', '»:«Keyworder.camelToUnderScore(attr)»«ENDFOR»)", «variable»); err != nil {
+		if _, err := p.masterDB.NamedExec("insert into `«Keyworder.camelToUnderScore(table)»` («FOR attr:attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»«ENDFOR») values («FOR attr:attrList SEPARATOR ', '»:«Keyworder.camelToUnderScore(attr)»«ENDFOR»)", «variable»); err != nil {
 			log.Fatal(errors.Wrap(err, "insert data error"))
 		}
 		'''
 	}
 	static def String generateShardingInsert(boolean isString, String idAttr, String variable, String table, List<String>attrList){
 		'''
-		db , table := p.shardingTableName«IF isString»String«ELSE»Integer«ENDIF»(«Keyworder.camelToUnderScore(table)», «variable».«Keyworder.firstUpperCase(idAttr)»)		
-		if _, err := db.NamedExec("update into " + table + " («FOR attr:attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»«ENDFOR») values («FOR attr:attrList SEPARATOR ', '»:«Keyworder.camelToUnderScore(attr)»«ENDFOR»)", «variable»); err != nil {
+		db , table := p.shardingTableName«IF isString»String«ELSE»Integer«ENDIF»("«Keyworder.camelToUnderScore(table)»", «variable».«Keyworder.firstUpperCase(idAttr)»)		
+		if _, err := db.NamedExec("insert into `" + table + "` («FOR attr:attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»«ENDFOR») values («FOR attr:attrList SEPARATOR ', '»:«Keyworder.camelToUnderScore(attr)»«ENDFOR»)", «variable»); err != nil {
 			log.Fatal(errors.Wrap(err, "insert data error"))
 		}
 		'''
 	}
 	static def String generateSingleUpdate(String variable, String table, List<String>attrList){
 		'''
-		if _, err := p.singleDB.NamedExec("update «Keyworder.camelToUnderScore(table)» set «FOR attr:attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»=:«Keyworder.camelToUnderScore(attr)»«ENDFOR»", «variable»); err != nil {
+		if _, err := p.singleDB.NamedExec("update `«Keyworder.camelToUnderScore(table)»` set «FOR attr:attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»=:«Keyworder.camelToUnderScore(attr)»«ENDFOR»", «variable»); err != nil {
 			log.Fatal(errors.Wrap(err, "insert data error"))
 		}
 		'''
 	}
 	static def String generateReplicationUpdate(String variable, String table, List<String>attrList){
 		'''
-		if _, err := p.masterDB.NamedExec("update «Keyworder.camelToUnderScore(table)» set «FOR attr:attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»=:«Keyworder.camelToUnderScore(attr)»«ENDFOR»", «variable»); err != nil {
+		if _, err := p.masterDB.NamedExec("update `«Keyworder.camelToUnderScore(table)»` set «FOR attr:attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»=:«Keyworder.camelToUnderScore(attr)»«ENDFOR»", «variable»); err != nil {
 			log.Fatal(errors.Wrap(err, "insert data error"))
 		}
 		'''
 	}
 	static def String generateShardingUpdate(boolean isString, String idAttr, String variable, String table, List<String>attrList){
 		'''
-		db , table := p.shardingTableName«IF isString»String«ELSE»Integer«ENDIF»(«Keyworder.camelToUnderScore(table)», «variable».«Keyworder.firstUpperCase(idAttr)»)		
-		if _, err := p.masterDB.NamedExec("update " + table + " set «FOR attr:attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»=:«Keyworder.camelToUnderScore(attr)»«ENDFOR»", «variable»); err != nil {
+		db , table := p.shardingTableName«IF isString»String«ELSE»Integer«ENDIF»("«Keyworder.camelToUnderScore(table)»", «variable».«Keyworder.firstUpperCase(idAttr)»)		
+		if _, err := db.NamedExec("update " + table + " set «FOR attr:attrList SEPARATOR ', '»«Keyworder.camelToUnderScore(attr)»=:«Keyworder.camelToUnderScore(attr)»«ENDFOR»", «variable»); err != nil {
 			log.Fatal(errors.Wrap(err, "insert data error"))
 		}
 		'''

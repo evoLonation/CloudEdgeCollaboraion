@@ -107,7 +107,7 @@ public class ServiceParser {
         if (type instanceof BasicType) {
             switch (((BasicType) type).getTypeEnum().name()) {
                 case "INTEGER":
-                    return "int32";
+                    return "int64";
                 case "TIME":
                     return "time.Time";
                 case "REAL":
