@@ -21,7 +21,7 @@ class ServerTemplate {
 			paramList.add(new Param(nameList.get(i), typeList.get(i)));
 		}
 		'''
-		type «Keyworder.firstLowerCase(operation)»Req struct {
+		type «Keyworder.firstUpperCase(operation)»Req struct {
 			«FOR param : paramList»
 			«Keyworder.firstUpperCase(param.name)» «param.type» `json:"«Keyworder.camelToUnderScore(param.name)»"`
 			«ENDFOR»
@@ -30,22 +30,22 @@ class ServerTemplate {
 	}
 	static def String generateRes(String operation, String type){
 		'''
-		type «Keyworder.firstLowerCase(operation)»Res struct {
+		type «Keyworder.firstUpperCase(operation)»Res struct {
 			Result «type» `json:"result"`
 		}
 		'''
 	}
 	static def String generateStartFuncFragment(String serviceName, String operationName, List<String> paramList){
 		'''
-		router.POST("«Keyworder.camelToDivider(serviceName)»/«Keyworder.camelToDivider(operationName)»", common.GetGinHandler(func(req *«Keyworder.firstLowerCase(operationName)»Req) (*«Keyworder.firstLowerCase(operationName)»Res, error) {
+		router.POST("«Keyworder.camelToDivider(serviceName)»/«Keyworder.camelToDivider(operationName)»", common.GetGinHandler(func(req *«Keyworder.firstUpperCase(operationName)»Req) (*«Keyworder.firstUpperCase(operationName)»Res, error) {
 			ret, err := «Keyworder.firstLowerCase(serviceName)».«Keyworder.firstUpperCase(operationName)»(«FOR param : paramList SEPARATOR ', '»req.«Keyworder.firstUpperCase(param)»«ENDFOR»)
-			return &«Keyworder.firstLowerCase(operationName)»Res{Result: ret}, err
+			return &«Keyworder.firstUpperCase(operationName)»Res{Result: ret}, err
 		}))
 		'''
 	}
 	static def String generateStartFuncFragmentHP(String serviceName, String operationName, List<String> paramList){
-		var req = '''«Keyworder.firstLowerCase(operationName)»Req'''
-		var res = '''«Keyworder.firstLowerCase(operationName)»Res'''
+		var req = '''«Keyworder.firstUpperCase(operationName)»Req'''
+		var res = '''«Keyworder.firstUpperCase(operationName)»Res'''
 		'''
 		producer := highpriority.NewProducer[«req», «res»](&highConf.«Keyworder.firstUpperCase(operationName)»)
 		router.POST("«Keyworder.camelToDivider(serviceName)»/«Keyworder.camelToDivider(operationName)»/high-priority", common.GetGinHandler(func(req *«req») (*«res», error) {
@@ -55,7 +55,7 @@ class ServerTemplate {
 	}
 	static def String generateStartFunc(List<String> serviceList, List<String> fragmentList){
 		'''
-		func Start(serverConf *config.ServerConf, highConf *config.HighPriorityConf, «FOR service: serviceList»«Keyworder.firstLowerCase(service)» *service.«Keyworder.firstUpperCase(service)», «ENDFOR»highPriorityService *service.HighPriorityService) {
+		func Start(serverConf *config.ServerConf, highConf *config.HighPriorityConf, «FOR service: serviceList SEPARATOR ','»«Keyworder.firstLowerCase(service)» *service.«Keyworder.firstUpperCase(service)»«ENDFOR») {
 			router := gin.Default()
 			«FOR fragment : fragmentList»
 			«fragment»

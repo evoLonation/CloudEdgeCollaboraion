@@ -1,5 +1,7 @@
 package com.rm2pt.generator.cloudedgecollaboration.info;
 
+import java.util.Locale;
+
 public class GlobalInfo {
     private int processNum;
     private int outPort;
@@ -16,7 +18,7 @@ public class GlobalInfo {
         this.tableShardingNum = tableShardingNum;
         this.redisShardingNum = redisShardingNum;
         this.databaseReplicationNum = databaseReplicationNum;
-        this.projectName = projectName;
+        this.projectName = projectName.toLowerCase();
     }
 
     public int getProcessNum() {

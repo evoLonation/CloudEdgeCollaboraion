@@ -43,7 +43,7 @@ public class Processor {
 		serviceFactory.factory();
 		new ServicePackageGenerator(serviceFactory.getServiceList(),
 				serviceFactory.getOperation(OperationInfo.ConcurrencyType.HIGHPRIORITY), globalInfo).generate();
-		new CommonPackageGenerator(globalInfo, serviceFactory.getServiceList()).generate();
+		new CommonPackageGenerator(globalInfo, serviceFactory.getServiceList(), serviceFactory.getOperation(OperationInfo.ConcurrencyType.HIGHPRIORITY)).generate();
 		new ConfigGenerator(serviceFactory.getOperation(OperationInfo.ConcurrencyType.HIGHPRIORITY), globalInfo)
 				.generate();
 		new ServerPackageGenerator(serviceFactory.getServiceList(), globalInfo).generate();

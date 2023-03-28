@@ -125,13 +125,14 @@ class CommonPackageTemplate {
 		package highpriority
 		
 		import (
+			"log"
 			"«project»/common"
 			"«project»/config"
-			"log"
 		
 			"github.com/adjust/rmq/v5"
 			"github.com/go-redis/redis/v8"
 			"github.com/pkg/errors"
+			"github.com/sony/sonyflake"
 		)
 		
 		type req[REQ any] struct {
@@ -146,6 +147,7 @@ class CommonPackageTemplate {
 		type commonContext struct {
 			queue rmq.Queue
 			rdb   *redis.Client
+			flake *sonyflake.Sonyflake
 		}
 		
 		func newContext(config *config.RedisConf) *commonContext {
@@ -161,8 +163,10 @@ class CommonPackageTemplate {
 			return &commonContext{
 				queue: queue,
 				rdb:   rdb,
+				flake: sonyflake.NewSonyflake(sonyflake.Settings{}),
 			}
 		}
+
 		'''
 	}
 	static def String generateConsumer(String project){
@@ -172,8 +176,8 @@ class CommonPackageTemplate {
 		import (
 			"context"
 			"encoding/json"
-			"«project»/config"
 			"log"
+			"«project»/config"
 			"sync"
 			"time"
 		
@@ -195,9 +199,10 @@ class CommonPackageTemplate {
 				log.Fatal(err)
 			}
 			wg := sync.WaitGroup{}
-			wg.Add(1)
 			p.queue.AddConsumerFunc("handler", func(delivery rmq.Delivery) {
 				wg.Wait()
+				wg.Add(1)
+				// log.Println("start consume!")
 				req := &req[REQ]{}
 				err := json.Unmarshal([]byte(delivery.Payload()), req)
 				if err != nil {
@@ -207,14 +212,20 @@ class CommonPackageTemplate {
 				param := req.Param
 				res := &res[RES]{}
 				res.Result, err = handler(param)
-				res.Err = err.Error()
-				if err := p.rdb.Publish(context.Background(), topic, "done").Err(); err != nil {
+				if err != nil {
+					res.Err = err.Error()
+				}
+				payload, err := json.Marshal(res)
+				if err != nil {
 					log.Fatal(err)
 				}
-				wg.Add(1)
+				if err := p.rdb.Publish(context.Background(), topic, string(payload)).Err(); err != nil {
+					log.Fatal(err)
+				}
+				// log.Println("consume done!")
+				wg.Done()
 			})
 		}
-		
 		'''
 	}
 	static def String generateProducer(String project){
@@ -225,10 +236,8 @@ class CommonPackageTemplate {
 			"context"
 			"encoding/json"
 			"fmt"
-			"«project»/config"
 			"log"
-			"strconv"
-			"time"
+			"«project»/config"
 		
 			"github.com/pkg/errors"
 		)
@@ -244,9 +253,14 @@ class CommonPackageTemplate {
 		}
 		
 		func (p *Producer[REQ, RES]) Publish(paramStruct *REQ) (*RES, error) {
-			topic := strconv.Itoa(int(time.Now().Unix()))
+			id, err := p.flake.NextID()
+			topic := fmt.Sprint(id)
+			if err != nil {
+				log.Fatal(err)
+			}
 			ctx := context.Background()
 			sub := p.rdb.Subscribe(ctx, topic)
+			// log.Println("subscribe !")
 			req := &req[REQ]{
 				Topic: topic,
 				Param: paramStruct,
@@ -258,7 +272,10 @@ class CommonPackageTemplate {
 			if err := p.queue.Publish(string(payload)); err != nil {
 				log.Printf("failed to publish: %s", err)
 			}
+			// log.Println("publish !")
 			msg, err := sub.ReceiveMessage(ctx)
+			// log.Println("receive msg " + msg.Payload)
+			// log.Println("Received message from " + msg.Channel + " channel")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -266,10 +283,15 @@ class CommonPackageTemplate {
 			if err := json.Unmarshal([]byte(msg.Payload), res); err != nil {
 				log.Fatal(err)
 			}
-			fmt.Println("Received message from " + msg.Channel + " channel.")
 			sub.Unsubscribe(ctx)
-			return res.Result, errors.New(res.Err)
+			// log.Println("unsubscribe !")
+			if res.Err != "" {
+				return res.Result, errors.New(res.Err)
+			} else {
+				return res.Result, nil
+			}
 		}
+
 		
 		'''
 	}
@@ -309,24 +331,32 @@ class CommonPackageTemplate {
 		        - containerPort: 8080
 		'''
 	}
-	static def String generateDeploy(String project){
+	static def String generateDeploy(String project, List<String> highOperationList){
 		'''
 		#!/bin/bash
 		. undeploy.sh
 		
 		docker build -f Dockerfile .. -t evolonation/«project»:v1.0 --push
+		«FOR operation : highOperationList»
+		docker build -f Dockerfile_highpriority_«operation.toLowerCase()» .. -t evolonation/«project»-highpriority-«operation.toLowerCase()»:v1.0 --push
+		«ENDFOR»
 		kubectl create -f main.yaml 
 		kubectl create -f mysql
 		kubectl create -f redis
+		kubectl create -f highpriority.yaml
 		'''
 	}
-	static def String generateUndeploy(String project){
+	static def String generateUndeploy(String project, List<String> highOperationList){
 		'''
 		#!/bin/bash
-		docker image rm evolonation/«project»:v1.0
 		kubectl delete -f mysql
 		kubectl delete -f redis
 		kubectl delete -f main.yaml 
+		kubectl delete -f highpriority.yaml
+		docker image rm evolonation/«project»:v1.0 --force
+		«FOR operation : highOperationList»
+		docker image rm evolonation/«project»-highpriority-«operation.toLowerCase()»:v1.0 --force
+		«ENDFOR»
 		
 		'''
 	}
@@ -381,10 +411,96 @@ class CommonPackageTemplate {
 		func main() {
 			conf := config.ParseConfig()
 			«FOR service : serviceList SEPARATOR ', '»«Keyworder.firstLowerCase(service)»«ENDFOR» := service.NewServices(&conf.Service)
-			server.Start(&conf.HttpServer, &conf.HighPriority, «FOR service : serviceList SEPARATOR ', '»«Keyworder.firstLowerCase(service)»«ENDFOR», service.NewPriorityService(&conf.Service, &conf.HighPriority))
+			server.Start(&conf.HttpServer, &conf.HighPriority, «FOR service : serviceList SEPARATOR ', '»«Keyworder.firstLowerCase(service)»«ENDFOR»)
 			common.Block()
 		}
 		
+		'''
+	}
+	static def String generateHighpriorityMain(String project, String operation, List<String> paramList){
+		var upper = Keyworder.firstUpperCase(operation)
+		var req = '''«upper»Req'''
+		var res = '''«upper»Res'''
+		'''
+		package main
+		
+		import (
+			"«project»/common"
+			"«project»/config"
+			"«project»/highpriority"
+			"«project»/server"
+			"«project»/service"
+		)
+		
+		func main() {
+			conf := config.ParseConfig()
+			highService := service.NewPriorityService(&conf.Service, &conf.HighPriority)
+			consumer := highpriority.NewConsumerRoutine[server.«req», server.«res»](&conf.HighPriority.«upper»)
+			consumer.StartComsumer(func(req *server.«req») (*server.«res», error) {
+				ret, err := highService.«upper»(«FOR param:paramList SEPARATOR ', '»req.«Keyworder.firstUpperCase(param)»«ENDFOR»)
+				return &server.«res»{Result: ret}, err
+			})
+			common.Block()
+		}
+		
+		'''
+	}
+	static def String generateHighpriorityMainDeploy(String project, List<String> highOperationList){
+		'''
+		«FOR operation : highOperationList»
+		apiVersion: apps/v1
+		kind: Deployment
+		metadata:
+		  name: «project»-highpriority-«operation.toLowerCase()»
+		spec:
+		  selector:
+		    matchLabels:
+		      app: «project»-highpriority-«operation.toLowerCase()»
+		  replicas: 1
+		  template:
+		    metadata:
+		      labels:
+		        app: «project»-highpriority-«operation.toLowerCase()»
+		    spec:
+		      containers:
+		      - name: «project»-highpriority-«operation.toLowerCase()»
+		        image: evolonation/«project»-highpriority-«operation.toLowerCase()»:v1.0
+		        imagePullPolicy: IfNotPresent # 如果image为本地构建则需要该参数	
+		«ENDFOR»
+		'''
+	}
+	static def String generateHighpriorityDockerfile(String highOperation){
+		'''
+		FROM golang:alpine AS builder
+		
+		LABEL stage=gobuilder
+		
+		ENV CGO_ENABLED 0 
+		ENV GOPROXY https://goproxy.cn,direct
+		ENV GOCACHE /build/.cache/go-build
+		RUN go install golang.org/x/tools/cmd/goimports@latest
+		
+		WORKDIR /build
+		
+		COPY go.mod .
+		COPY ./config ./config
+		COPY ./main ./main
+		COPY ./highpriority ./highpriority
+		COPY ./server ./server
+		COPY ./service ./service
+		COPY ./entity ./entity
+		COPY ./common ./common
+		RUN go mod tidy
+		RUN goimports -w .
+		RUN --mount=type=cache,target=/build/.cache/go-build go build -ldflags="-s -w" -o /app/main ./main/highpriority/«highOperation.toLowerCase()»/main.go
+		
+		FROM scratch
+		
+		WORKDIR /app
+		COPY --from=builder /app/main ./
+		COPY ./etc ./etc
+		
+		CMD ["./main"]
 		'''
 	}
 }

@@ -8,11 +8,16 @@ class ServiceTemplate {
 		package service
 		
 		import (
+			ctx "context"
 			"database/sql"
-			"«project»/entity"
+			"encoding/json"
+			"fmt"
 			"log"
+			"«project»/entity"
 			"sync"
+			"time"
 		
+			redis "github.com/go-redis/redis/v8"
 			"github.com/pkg/errors"
 		)
 		

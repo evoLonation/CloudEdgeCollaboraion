@@ -11,6 +11,7 @@ class ContextTemplate {
 		
 		import (
 			"fmt"
+			"log"
 			"«project»/common"
 			"«project»/config"
 		
@@ -39,13 +40,30 @@ class ContextTemplate {
 			return int64(id)
 		}
 		
-		func (p *context) shardingTableNameInteger(tableName string, id int64) (*sqlx.DB, string) {
-			tableId := id % p.shardingTableNum
-			dbId := id / p.shardingTableNum % p.shardingDBNum
-			return p.shardingDB[dbId], fmt.Sprintf("%s_%d", tableName, tableId)
+		func (p *context) shardingRedis(id any) *redis.Client {
+			integerId, ok := id.(int64)
+			if !ok {
+				stringId := id.(string)
+				integerId = common.Hash(stringId)
+			}
+			if integerId < 0 {
+				integerId = -integerId
+			}
+			redisId := integerId % p.redisClusterNum
+			return p.rdbs[redisId]
 		}
-		func (p *context) shardingTableNameString(tableName string, id string) (*sqlx.DB, string) {
-			return p.shardingTableNameInteger(tableName, common.Hash(id))
+		func (p *context) shardingTableName(tableName string, id any) (*sqlx.DB, string) {
+			integerId, ok := id.(int64)
+			if !ok {
+				stringId := id.(string)
+				integerId = common.Hash(stringId)
+			}
+			if integerId < 0 {
+				integerId = -integerId
+			}
+			tableId := integerId % p.shardingTableNum
+			dbId := integerId / p.shardingTableNum % p.shardingDBNum
+			return p.shardingDB[dbId], fmt.Sprintf("%s_%d", tableName, tableId)
 		}
 		
 		func newContext(conf *config.ServiceConf) *context {

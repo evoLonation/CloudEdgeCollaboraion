@@ -120,19 +120,19 @@ public class OperationBodyGenerator {
         var attrList = new ArrayList<>(changeSet.get(variable));
         if(variable.getScopeType() == Variable.ScopeType.LET){
             if(entityInfo.getStorageType() == EntityInfo.StorageType.DEFAULT){
-            	return OperationBodyTemplate.generateSingleInsert(variable.getName(), table, attrList);
+            	return OperationBodyTemplate.generateSingleInsert(variable.getName(), table, attrList, entityInfo.getIdAttribute().getName());
             }else if(entityInfo.getStorageType() == EntityInfo.StorageType.HIGHREAD){
-                return OperationBodyTemplate.generateReplicationInsert(variable.getName(), table, attrList);
+                return OperationBodyTemplate.generateReplicationInsert(variable.getName(), table, attrList, entityInfo.getIdAttribute().getName());
             }else if(entityInfo.getStorageType() == EntityInfo.StorageType.HIGHSTORE){
-                return OperationBodyTemplate.generateShardingInsert(false, entityInfo.getIdAttribute().getName(), variable.getName(), table, attrList);
+                return OperationBodyTemplate.generateShardingInsert(variable.getName(), table, attrList, entityInfo.getIdAttribute().getName());
             }else{throw new UnsupportedOperationException();}
         }else{
             if(entityInfo.getStorageType() == EntityInfo.StorageType.DEFAULT){
-                return OperationBodyTemplate.generateSingleUpdate(variable.getName(), table, attrList);
+                return OperationBodyTemplate.generateSingleUpdate(variable.getName(), table, attrList, entityInfo.getIdAttribute().getName());
             }else if(entityInfo.getStorageType() == EntityInfo.StorageType.HIGHREAD){
-                return OperationBodyTemplate.generateReplicationUpdate(variable.getName(), table, attrList);
+                return OperationBodyTemplate.generateReplicationUpdate(variable.getName(), table, attrList, entityInfo.getIdAttribute().getName());
             }else if(entityInfo.getStorageType() == EntityInfo.StorageType.HIGHSTORE){
-                return OperationBodyTemplate.generateShardingUpdate(false, entityInfo.getIdAttribute().getName(), variable.getName(), table, attrList);
+                return OperationBodyTemplate.generateShardingUpdate(variable.getName(), table, attrList, entityInfo.getIdAttribute().getName());
             }else{throw new UnsupportedOperationException();}
         }
     }
@@ -176,15 +176,16 @@ public class OperationBodyGenerator {
         var attrList = new ArrayList<>(useSet.get(condition.getTargetVar()));
         if(type == EntityInfo.StorageType.DEFAULT){
             return OperationBodyTemplate.generateSingleSelect(false, condition.getTargetVar().getName(), entityInfo.getName(),
-                    attrList, Keyworder.camelToUnderScore(entityInfo.getIdAttribute().getName()) + " = ?",
-                    Collections.singletonList(generateRValue(rightValue)));
+                    attrList, entityInfo.getIdAttribute().getName(),
+                    generateRValue(rightValue));
         }else if(type == EntityInfo.StorageType.HIGHREAD){
             return OperationBodyTemplate.generateReplicationSelect(false, isConsistency, condition.getTargetVar().getName(), entityInfo.getName(),
-                    attrList, entityInfo.getIdAttribute().getName() + " = ?",
-                    Collections.singletonList(generateRValue(rightValue)));
+                    attrList, entityInfo.getIdAttribute().getName(),
+                    generateRValue(rightValue));
         }else if(type == EntityInfo.StorageType.HIGHSTORE){
-            return OperationBodyTemplate.generateShardingSelect(false, condition.getTargetVar().getName(), generateRValue(rightValue),
-                    entityInfo.getName(), attrList, entityInfo.getIdAttribute().getName());
+            return OperationBodyTemplate.generateShardingSelect(condition.getTargetVar().getName(), entityInfo.getName(),
+                    attrList, entityInfo.getIdAttribute().getName(),
+                    generateRValue(rightValue));
         }else{throw new UnsupportedOperationException();}
     }
 
