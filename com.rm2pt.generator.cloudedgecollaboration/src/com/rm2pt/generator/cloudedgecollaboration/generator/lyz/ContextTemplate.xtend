@@ -26,10 +26,39 @@ class ContextTemplate {
 			masterDB         *sqlx.DB
 			readDB           *sqlx.DB
 			rdbs             []*redis.Client
+			mutex            *redis.Client	
 			shardingDBNum    int64
 			shardingTableNum int64
 			redisClusterNum  int64
 			flake            *sonyflake.Sonyflake
+		}
+		
+		func (p *context) addMutex(mutexs ...string) {
+			values := make([]string, len(mutexs)*2)
+			for i, mutex := range mutexs {
+				values[i*2] = mutex
+				values[i*2+1] = "true"
+			}
+			for {
+				ok, err := p.mutex.MSetNX(ctx.Background(), values).Result()
+				if err != nil {
+					log.Fatal(err)
+				}
+				if ok {
+					break
+				}
+				// log.Println("not ok, wait")
+				time.Sleep(10 * time.Millisecond)
+			}
+		}
+		
+		func (p *context) removeMutex(mutexs ...string) {
+			if num, err := p.mutex.Del(ctx.Background(), mutexs...).Result(); err != nil {
+				log.Fatal(err)
+				if num != int64(len(mutexs)) {
+					log.Fatal("del number not equals to mutex number")
+				}
+			}
 		}
 		
 		func (p *context) generateId() int64 {
@@ -82,6 +111,7 @@ class ContextTemplate {
 				masterDB:         common.NewMysqlDB(conf.ReplicationDB.MasterSource),
 				readDB:           common.NewMysqlDB(conf.ReplicationDB.ReadSource),
 				rdbs:             rdbs,
+				mutex:            common.NewRedisClient(&conf.RedisMutex),
 				shardingDBNum:    conf.ShardingDB.DatabaseNumber,
 				shardingTableNum: conf.ShardingDB.TableNumber,
 				redisClusterNum:  conf.RedisCluster.NodeNumber,

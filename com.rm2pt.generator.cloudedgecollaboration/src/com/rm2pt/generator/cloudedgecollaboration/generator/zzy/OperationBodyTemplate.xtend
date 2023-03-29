@@ -5,8 +5,10 @@ import java.util.Set
 import com.rm2pt.generator.cloudedgecollaboration.common.Keyworder
 
 class OperationBodyTemplate {
-	static def String generate(List<String> variableList, List<String> selectList, String preconditionExp, String postcondition){
+	static def String generate(List<String> mutexList, List<String> variableList, List<String> selectList, String preconditionExp, String postcondition){
 		'''
+		// mutex
+		«generateMutex(mutexList)»
 		// variable declare
 		«FOR variable : variableList»
 		«variable»
@@ -200,6 +202,16 @@ class OperationBodyTemplate {
 			wg.Wait()
 			result = «result»
 		}
+		'''
+	}
+	
+	static def String generateMutex(List<String> mutexList){
+		'''
+		mutexs := []string{«FOR mutex:mutexList SEPARATOR ','»«mutex»«ENDFOR»}
+		p.addMutex(mutexs...)
+		defer func() {
+			p.removeMutex(mutexs...)
+		}()
 		'''
 	}
 	

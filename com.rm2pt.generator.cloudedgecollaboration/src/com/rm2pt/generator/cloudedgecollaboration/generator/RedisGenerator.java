@@ -19,5 +19,6 @@ public class RedisGenerator extends Generator{
     public void generate() {
         generateFile("build/redis/cluster.yaml", RedisTemplate.generateCluster(redisNumber));
         generateFile("build/redis/highpriority.yaml", RedisTemplate.generateHighpriority(operationNameList));
+        generateFile("build/redis/mutex.yaml", RedisTemplate.generateMutex());
     }
 }

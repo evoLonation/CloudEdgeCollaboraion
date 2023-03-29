@@ -37,6 +37,9 @@ class ConfigTemplate {
 		    - addr: redis-cluster-«num».redis-cluster:6379
 		      password: 2002116yy
 		    «ENDFOR»
+		  redisMutex:
+		      addr: redis-mutex:6379
+		      password: 2002116yy
 		highPriority:
 		  «FOR operation: hpOperationList»
 		  «Keyworder.firstLowerCase(operation)»:
@@ -73,6 +76,7 @@ class ConfigTemplate {
 			ReplicationDB ReplicationDBConf `yaml:"replicationDB"`
 			ShardingDB    ShardingDBConf    `yaml:"shardingDB"`
 			RedisCluster  RedisClusterConf  `yaml:"redisCluster"`
+			RedisMutex    RedisConf         `yaml:"redisMutex"`
 		}
 		type ReplicationDBConf struct {
 			MasterSource string `yaml:"masterSource"`

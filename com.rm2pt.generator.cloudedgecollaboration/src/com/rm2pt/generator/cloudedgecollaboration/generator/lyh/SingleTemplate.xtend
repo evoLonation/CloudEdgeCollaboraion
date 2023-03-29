@@ -38,6 +38,19 @@ class SingleTemplate{
 		        volumeMounts:
 		        - name: scripts
 		          mountPath: /docker-entrypoint-initdb.d
+		        livenessProbe:
+		          exec:
+		            command: ["mysqladmin", "ping"]
+		          initialDelaySeconds: 30
+		          periodSeconds: 10
+		          timeoutSeconds: 5
+		        readinessProbe:
+		          exec:
+		            # Check we can execute queries over TCP (skip-networking is off).
+		            command: ["mysql", "-h", "127.0.0.1", "-e", "-p2002116yy", "SELECT 1"]
+		          initialDelaySeconds: 5
+		          periodSeconds: 2
+		          timeoutSeconds: 1
 		      volumes:
 		      - name: scripts
 		        configMap:

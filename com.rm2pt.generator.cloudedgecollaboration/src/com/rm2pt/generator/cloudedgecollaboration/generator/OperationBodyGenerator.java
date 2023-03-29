@@ -20,7 +20,9 @@ import com.rm2pt.generator.cloudedgecollaboration.info.operationBody.value.*;
 import net.mydreamy.requirementmodel.rEMODEL.IfExpCS;
 
 import java.util.*;
+import java.util.logging.Formatter;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class OperationBodyGenerator {
     private List<Statement> statementList;
@@ -109,7 +111,7 @@ public class OperationBodyGenerator {
         useSet.get(variable).add(attribute.getName());
     }
     public String generate() {
-        return OperationBodyTemplate.generate(variableSet.stream().map(this::generateVariable).collect(Collectors.toList()),
+        return OperationBodyTemplate.generate(generateMutex(), variableSet.stream().map(this::generateVariable).collect(Collectors.toList()),
                 conditionList.stream().map(this::generateCondition).collect(Collectors.toList()),
                 generatePrecondition(), generatePostcondition()
                 );
@@ -160,7 +162,18 @@ public class OperationBodyGenerator {
         return generateRValue(assign.getLeft()) + " = " + generateRValue(assign.getRight());
     }
 
-    public String generateCondition(Condition condition){
+    private static class SelectByIdRes{
+        public EntityInfo entityInfo;
+        public EntityInfo.Attribute id;
+        public RValue param;
+        public SelectByIdRes(EntityInfo entityInfo, EntityInfo.Attribute id, RValue param) {
+            this.entityInfo = entityInfo;
+            this.id = id;
+            this.param = param;
+        }
+    }
+
+    private SelectByIdRes mustSelectById(Condition condition){
         var entityInfo = ((AllInstance)condition.getSource()).getEntityInfo();
         var type = entityInfo.getStorageType();
         var logicExp = (AtomicExp)((ConnectExp)condition.getLogicExp()).getLogicExpList().get(0);
@@ -173,6 +186,14 @@ public class OperationBodyGenerator {
             throw new UnsupportedOperationException();
         }
         var rightValue = logicExp.getRight();
+        return new SelectByIdRes(entityInfo, leftValue.getAttribute(), rightValue);
+    }
+
+    public String generateCondition(Condition condition){
+        var res = mustSelectById(condition);
+        var entityInfo = res.entityInfo;
+        var type = entityInfo.getStorageType();
+        var rightValue = res.param;
         var attrList = new ArrayList<>(useSet.get(condition.getTargetVar()));
         if(type == EntityInfo.StorageType.DEFAULT){
             return OperationBodyTemplate.generateSingleSelect(false, condition.getTargetVar().getName(), entityInfo.getName(),
@@ -252,6 +273,46 @@ public class OperationBodyGenerator {
         }else{
             throw new UnsupportedOperationException();
         }
+    }
+
+    private List<String> generateMutex(){
+        return Stream.concat(
+                conditionList.stream().flatMap(condition -> {
+                    var res = mustSelectById(condition);
+                    var param = generateRValue(res.param);
+                    var target = condition.getTargetVar();
+                    var entity = res.entityInfo.getName().toLowerCase();
+                    Set<String> ret = new HashSet<>(2);
+                    if (useSet.containsKey(target)) {
+                        ret.add(String.format("\"%s\" + fmt.Sprint(%s) + \"read\"", entity, param));
+                    }
+                    if (changeSet.containsKey(target)) {
+                        ret.add(String.format("\"%s\" + fmt.Sprint(%s) + \"write\"", entity, param));
+                        ret.add(String.format("\"%s\" + fmt.Sprint(%s) + \"read\"", entity, param));
+                    }
+                    return ret.stream();
+                }),
+                changeSet.entrySet().stream().flatMap(e -> {
+                    var v = e.getKey();
+                    if (v.getScopeType() != Variable.ScopeType.LET) {
+                        return Stream.empty();
+                    }
+                    var idAssign = assignList.stream().filter(a ->
+                                    a.getLeft().getVariable().equals(v) &&
+                                            a.getLeft().getAttribute().equals(v.mustGetEntity().getIdAttribute()))
+                            .findAny().get();
+                    if(idAssign.getLeft().getAttribute().getName().equals("GenerateId")){
+                        return Stream.empty();
+                    }
+                    return Stream.of(String.format("\"%s\" + fmt.Sprint(%s) + \"write\"",
+                            idAssign.getLeft().getVariable().mustGetEntity().getName().toLowerCase(),
+                            generateRValue(idAssign.getRight())),
+                            String.format("\"%s\" + fmt.Sprint(%s) + \"read\"",
+                                    idAssign.getLeft().getVariable().mustGetEntity().getName().toLowerCase(),
+                                    generateRValue(idAssign.getRight()))
+                            );
+                })).distinct().collect(Collectors.toList());
+
     }
 
 
